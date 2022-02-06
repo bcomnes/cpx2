@@ -143,6 +143,56 @@ describe("The copy method", () => {
         })
     })
 
+    describe.only("should copy specified files with globs that include ignore directives:", () => {
+        beforeEach(() =>
+            setupTestDir({
+                "test-ws/node_modules/hi.png": "no-copy",
+                "test-ws/node_modules/foo/bar.png": "no-copy",
+                "test-ws/static/hi.jpg": "hi.jpg contents",
+                "test-ws/static/foo/bar.jpg": "bar.jpg contents",
+            })
+        )
+        //  afterEach(() => teardownTestDir("test-ws"))
+
+        /**
+         * Verify.
+         * @returns {void}
+         */
+        function verifyFiles() {
+            return verifyTestDir({
+                "test-ws/node_modules/hi.png": "no-copy",
+                "test-ws/node_modules/foo/bar.png": "no-copy",
+                "test-ws/static/hi.jpg": "hi.jpg contents",
+                "test-ws/static/foo/bar.jpg": "bar.jpg contents",
+                "test-ws/public/static/hi.jpg": "hi.jpg contents",
+                "test-ws/public/static/foo/bar.jpg": "bar.jpg contents",
+                "test-ws/public/node_modules/hi.png": null,
+                "test-ws/public/node_modules/foo/bar.png": null,
+            })
+        }
+
+        it("lib async version.", done => {
+            cpx.copy("test-ws/!(node_modules)**/*.{png,jpg}", "public", () =>
+                verifyFiles().then(() => done(), done)
+            )
+        })
+
+        it("lib async version (promise).", () =>
+            cpx
+                .copy("test-ws/!(node_modules)**/*.{png,jpg}", "public")
+                .then(verifyFiles))
+
+        it("lib sync version.", () => {
+            cpx.copySync("test-ws/!(node_modules)**/*.{png,jpg}", "public")
+            return verifyFiles()
+        })
+
+        it("command version.", () => {
+            execCommandSync('"test-ws/!(node_modules)**/*.{png,jpg}" public')
+            return verifyFiles()
+        })
+    })
+
     describe("should clean and copy specified files with globs when give clean option:", () => {
         beforeEach(() =>
             setupTestDir({
