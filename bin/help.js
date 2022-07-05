@@ -3,19 +3,19 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-"use strict"
+'use strict'
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // Exports
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 
 /**
  * Prints the help text.
  *
  * @returns {void}
  */
-module.exports = function help() {
-    console.log(`
+module.exports = function help () {
+  console.log(`
 Usage: cpx <source> <dest> [options]
 
     cpx2: Copy files, watching for changes.

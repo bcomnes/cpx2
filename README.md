@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/cpx2.svg)](https://www.npmjs.com/package/cpx2)
 [![Downloads/month](https://img.shields.io/npm/dm/cpx2.svg)](http://www.npmtrends.com/cpx2)
-[![Build Status](https://travis-ci.org/bcomnes/cpx2.svg?branch=master)](https://travis-ci.org/bcomnes/cpx2)
+[![tests](https://github.com/bcomnes/cpx2/actions/workflows/test.yml/badge.svg)](https://github.com/bcomnes/cpx2/actions/workflows/test.yml)
 
 Copy file globs, watching for changes.
 
@@ -15,8 +15,6 @@ This is a maintained fork of [mysticatea/cpx](https://github.com/mysticatea/cpx)
 ```
 npm install cpx2
 ```
-
-- Requires Node.js `>=6.5`.
 
 ## Usage
 

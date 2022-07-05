@@ -3,21 +3,21 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-"use strict"
+'use strict'
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // Requirements
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 
-const assert = require("assert")
-const exec = require("child_process").exec
-const dirname = require("path").dirname
-const fs = require("fs-extra")
-const execSync = require("shelljs").exec
+const assert = require('assert')
+const exec = require('child_process').exec
+const dirname = require('path').dirname
+const fs = require('fs-extra')
+const execSync = require('shelljs').exec
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // Public Interface
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 
 /**
  * Wait for the given duration.
@@ -25,8 +25,8 @@ const execSync = require("shelljs").exec
  * @param {number} ms The duration in milliseconds to wait.
  * @returns {Promise<void>} The promise which will go fulfilled after the duration.
  */
-const delay = (module.exports.delay = function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
+const delay = (module.exports.delay = function delay (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 })
 
 /**
@@ -36,12 +36,12 @@ const delay = (module.exports.delay = function delay(ms) {
  * @param {string} contentText - A text to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-const writeFile = (module.exports.writeFile = async function writeFile(
-    path,
-    contentText
+const writeFile = (module.exports.writeFile = async function writeFile (
+  path,
+  contentText
 ) {
-    await fs.ensureDir(dirname(path))
-    await fs.writeFile(path, contentText)
+  await fs.ensureDir(dirname(path))
+  await fs.writeFile(path, contentText)
 })
 
 /**
@@ -50,8 +50,8 @@ const writeFile = (module.exports.writeFile = async function writeFile(
  * @param {string} path - A path to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-module.exports.removeFile = function removeFile(path) {
-    return fs.remove(path)
+module.exports.removeFile = function removeFile (path) {
+  return fs.remove(path)
 }
 
 /**
@@ -60,8 +60,8 @@ module.exports.removeFile = function removeFile(path) {
  * @param {string} path - A path to read.
  * @returns {Promise<string|null>} The content of the file, or `null` if not found.
  */
-const readFile = (module.exports.content = function content(path) {
-    return fs.readFile(path, { encoding: "utf8" }).catch(() => null)
+const readFile = (module.exports.content = function content (path) {
+  return fs.readFile(path, { encoding: 'utf8' }).catch(() => null)
 })
 
 /**
@@ -70,14 +70,14 @@ const readFile = (module.exports.content = function content(path) {
  * @param {object} dataset - Test data to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-module.exports.setupTestDir = function setupTestDir(dataset) {
-    return Promise.all(
-        Object.keys(dataset).map(path =>
-            dataset[path] == null
-                ? fs.ensureDir(path)
-                : writeFile(path, dataset[path])
-        )
-    ).then(() => delay(250))
+module.exports.setupTestDir = function setupTestDir (dataset) {
+  return Promise.all(
+    Object.keys(dataset).map(path =>
+      dataset[path] == null
+        ? fs.ensureDir(path)
+        : writeFile(path, dataset[path])
+    )
+  ).then(() => delay(250))
 }
 
 /**
@@ -86,8 +86,8 @@ module.exports.setupTestDir = function setupTestDir(dataset) {
  * @param {string} testRootPath - A path to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
-    return fs.remove(testRootPath)
+module.exports.teardownTestDir = function teardownTestDir (testRootPath) {
+  return fs.remove(testRootPath)
 }
 
 /**
@@ -96,11 +96,11 @@ module.exports.teardownTestDir = function teardownTestDir(testRootPath) {
  * @param {object} dataset - Test data to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
-module.exports.verifyTestDir = async function verifyTestDir(dataset) {
-    for (const path of Object.keys(dataset)) {
-        const content = await readFile(path)
-        assert.strictEqual(content, dataset[path])
-    }
+module.exports.verifyTestDir = async function verifyTestDir (dataset) {
+  for (const path of Object.keys(dataset)) {
+    const content = await readFile(path)
+    assert.strictEqual(content, dataset[path])
+  }
 }
 
 /**
@@ -108,8 +108,8 @@ module.exports.verifyTestDir = async function verifyTestDir(dataset) {
  * @param {string} args - Command arguments.
  * @returns {child_process.ChildProcess} A child process object.
  */
-module.exports.execCommand = function execCommand(args) {
-    return exec(`node test/util/bin.js ${args}`)
+module.exports.execCommand = function execCommand (args) {
+  return exec(`node test/util/bin.js ${args}`)
 }
 
 /**
@@ -117,6 +117,6 @@ module.exports.execCommand = function execCommand(args) {
  * @param {string} args - Command arguments.
  * @returns {void}
  */
-module.exports.execCommandSync = function execCommandSync(args) {
-    return execSync(`node test/util/bin.js ${args}`, { silent: true })
+module.exports.execCommandSync = function execCommandSync (args) {
+  return execSync(`node test/util/bin.js ${args}`, { silent: true })
 }

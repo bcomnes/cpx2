@@ -1,9 +1,0 @@
-root: true
-extends:
-  - plugin:@mysticatea/es2015
-  - plugin:@mysticatea/+node
-
-overrides:
-  - files: "bin/*.js"
-    rules:
-      no-console: off

@@ -3,7 +3,7 @@
   "version": "4.2.3",
   "description": "Copy file globs, watching for changes.",
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "main": "lib/index.js",
   "bin": {
@@ -19,7 +19,7 @@
     "_mocha": "_mocha \"test/*.js\" --timeout 35000",
     "clean": "rm -rf .nyc_output coverage test-ws",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
-    "lint": "eslint bin lib test",
+    "lint": "standard",
     "pretest": "npm run -s lint",
     "test": "nyc --require @babel/register npm run -s _mocha",
     "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
@@ -33,7 +33,7 @@
     "glob2base": "0.0.12",
     "ignore": "^5.1.8",
     "minimatch": "^9.0.0",
-    "p-map": "^4.0.0",
+    "p-map": "^6.0.0",
     "resolve": "^1.12.0",
     "safe-buffer": "^5.2.0",
     "shell-quote": "^1.8.0",
@@ -42,17 +42,16 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
-    "@mysticatea/eslint-plugin": "^13.0.0",
     "auto-changelog": "^2.2.0",
     "babel-preset-power-assert": "^3.0.0",
-    "eslint": "^7.9.0",
-    "mocha": "^10.2.0",
     "gh-release": "^7.0.2",
+    "mocha": "^10.2.0",
     "nyc": "15.1.0",
     "opener": "^1.5.1",
-    "p-event": "^4.1.0",
+    "p-event": "^6.0.0",
     "power-assert": "^1.6.1",
     "shelljs": "^0.8.3",
+    "standard": "^17.1.0",
     "through": "^2.3.8"
   },
   "repository": {
