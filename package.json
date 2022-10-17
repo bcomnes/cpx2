@@ -47,7 +47,7 @@
     "babel-preset-power-assert": "^3.0.0",
     "eslint": "^7.9.0",
     "gh-release": "^6.0.0",
-    "mocha": "^9.0.3",
+    "mocha": "^10.1.0",
     "nyc": "15.1.0",
     "opener": "^1.5.1",
     "p-event": "^4.1.0",
