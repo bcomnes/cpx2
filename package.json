@@ -50,7 +50,7 @@
     "gh-release": "^7.0.2",
     "nyc": "15.1.0",
     "opener": "^1.5.1",
-    "p-event": "^4.1.0",
+    "p-event": "^6.0.0",
     "power-assert": "^1.6.1",
     "shelljs": "^0.8.3",
     "through": "^2.3.8"
