@@ -8,7 +8,7 @@ on:
         required: true
 
 env:
-  node_version: 14
+  node_version: 20
   FORCE_COLOR: 2
 
 jobs:
