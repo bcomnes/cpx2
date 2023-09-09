@@ -23,10 +23,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm i
     - run: npm test --color=always
-    - name: Coveralls
-      uses: coverallsapp/github-action@v2
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
   
   automerge:
     needs: test
