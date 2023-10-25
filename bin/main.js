@@ -176,6 +176,7 @@ module.exports = function main (source, outDir, args) {
       }
       return Promise.resolve()
     }).catch(error => {
+      console.error(error)
       console.error(`Failed to copy: ${error.message}.`)
       process.exit(1)
     })
