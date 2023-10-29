@@ -6,6 +6,7 @@
     "node": ">=16"
   },
   "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
   "bin": {
     "cpx": "bin/index.js"
   },
@@ -14,14 +15,18 @@
     "lib"
   ],
   "scripts": {
-    "prepublishOnly": "git push --follow-tags && gh-release -y",
+    "prepublishOnly": "npm run build && git push --follow-tags && gh-release -y",
+    "postpublish": "npm run clean",
     "version": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:' && git add CHANGELOG.md",
     "_mocha": "_mocha \"test/*.js\" --timeout 35000",
-    "clean": "rm -rf .nyc_output coverage test-ws",
+    "clean": "run-p clean:*",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
     "lint": "standard",
     "test": "nyc --require @babel/register npm run -s _mocha",
-    "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
+    "watch": "npm run -s _mocha -- --require @babel/register --watch --growl",
+    "build": "npm run clean && run-p build:*",
+    "build:declaration": "tsc -p declaration.tsconfig.json",
+    "clean:declarations-lib": "rm -rf $(find {lib,bin} -type f -name '*.d.ts*' ! -name '*-types.d.ts')"
   },
   "dependencies": {
     "debounce": "^1.2.0",
@@ -41,17 +46,21 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
+    "@types/node": "^20.8.9",
+    "@voxpelli/tsconfig": "^9.0.0",
     "auto-changelog": "^2.2.0",
     "babel-preset-power-assert": "^3.0.0",
     "gh-release": "^7.0.2",
     "mocha": "^10.2.0",
+    "npm-run-all2": "^6.1.1",
     "nyc": "15.1.0",
     "opener": "^1.5.1",
     "p-event": "^6.0.0",
     "power-assert": "^1.6.1",
     "shelljs": "^0.8.3",
     "standard": "^17.1.0",
-    "through": "^2.3.8"
+    "through": "^2.3.8",
+    "typescript": "~5.2.2"
   },
   "repository": {
     "type": "git",

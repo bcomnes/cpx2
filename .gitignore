@@ -5,3 +5,6 @@
 /npm-debug.log
 /test.js
 package-lock.json
+
+*.d.ts
+*.d.ts.map
