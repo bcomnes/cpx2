@@ -482,6 +482,7 @@ describe('The watch method', function () {
     }
   ]
   for (const pattern of patterns) {
+    // eslint-disable-next-line mocha/no-setup-in-describe
     ;(pattern.only ? describe.only : describe)(pattern.description, () => {
       beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
@@ -526,9 +527,12 @@ describe('The watch method', function () {
     }
   ]
   for (const pattern of patternsWithIgnore) {
+    // eslint-disable-next-line mocha/no-setup-in-describe
     ;(pattern.only ? describe.only : describe)(pattern.description, () => {
+      // eslint-disable-next-line mocha/no-sibling-hooks
       beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
+      // eslint-disable-next-line mocha/no-identical-title
       it('lib version.', async function () {
         watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
           ignore: pattern.ignore
@@ -539,6 +543,7 @@ describe('The watch method', function () {
         await verifyTestDir(pattern.verify)
       })
 
+      // eslint-disable-next-line mocha/no-identical-title
       it('command version.', async function () {
         command = execCommand(
                     `"test-ws/a/**/*.txt" test-ws/b --watch --verbose --ignore ${pattern.ignore.join(
