@@ -5,9 +5,6 @@
  */
 'use strict'
 
-// TODO: remove.
-/* eslint-disable no-process-exit, no-process-env */
-
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
@@ -182,5 +179,3 @@ module.exports = function main (source, outDir, args) {
     })
   }
 }
-
-/* eslint-enable no-process-exit, no-process-env */

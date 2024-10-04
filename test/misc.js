@@ -18,8 +18,8 @@ const execCommandSync = require('./util/util').execCommandSync
 // Test
 // ------------------------------------------------------------------------------
 
-describe('[misc]', () => {
-  it('should throw error if invalid option was given.', () => {
+describe('[misc]', function () {
+  it('should throw error if invalid option was given.', function () {
     const result = execCommandSync(
       '"test-ws/a/**/*.txt" test-ws/b --invalid'
     )
@@ -28,7 +28,7 @@ describe('[misc]', () => {
     assert(result.stderr === 'Unknown option(s): --invalid\n')
   })
 
-  it('should throw error if invalid options were given.', () => {
+  it('should throw error if invalid options were given.', function () {
     const result = execCommandSync(
       '"test-ws/a/**/*.txt" test-ws/b --invalid --foo --bar'
     )
@@ -37,42 +37,42 @@ describe('[misc]', () => {
     assert(result.stderr === 'Unknown option(s): --invalid, --foo, --bar\n')
   })
 
-  it('should throw error and show help if <source> and <dest> were lacking.', () => {
+  it('should throw error and show help if <source> and <dest> were lacking.', function () {
     const result = execCommandSync('')
 
     assert(result.code === 1)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should throw error and show help if <dest> was lacking.', () => {
+  it('should throw error and show help if <dest> was lacking.', function () {
     const result = execCommandSync('test-ws/**/*.js')
 
     assert(result.code === 1)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show help if --help option was given.', () => {
+  it('should show help if --help option was given.', function () {
     const result = execCommandSync('--help')
 
     assert(result.code === 0)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show help if -h option was given.', () => {
+  it('should show help if -h option was given.', function () {
     const result = execCommandSync('--help')
 
     assert(result.code === 0)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show version if --version option was given.', () => {
+  it('should show version if --version option was given.', function () {
     const result = execCommandSync('--version')
 
     assert(result.code === 0)
     assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/u.test(result.stdout))
   })
 
-  it('should show version if -V option was given.', () => {
+  it('should show version if -V option was given.', function () {
     const result = execCommandSync('-V')
 
     assert(result.code === 0)

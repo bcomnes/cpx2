@@ -31,11 +31,11 @@ const pEventPromise = import('p-event')
 // Test
 // ------------------------------------------------------------------------------
 
-describe('The watch method', () => {
+describe('The watch method', function () {
   let watcher = null
   let command = null
 
-  afterEach(async () => {
+  afterEach(async function () {
     if (watcher) {
       watcher.close()
       watcher = null
@@ -45,7 +45,7 @@ describe('The watch method', () => {
       const pEvent = (await pEventPromise).pEvent
       await pEvent(command, 'exit')
       await teardownTestDir('test-ws')
-      command = null // eslint-disable-line require-atomic-updates
+      command = null
     } else {
       await teardownTestDir('test-ws')
     }
@@ -60,7 +60,6 @@ describe('The watch method', () => {
     if (watcher) {
       await pEvent(watcher, 'watch-ready')
     } else if (command) {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const chunk = await pEvent(command.stdout, 'data')
         if (chunk.indexOf('Be watching') >= 0) {
@@ -80,7 +79,6 @@ describe('The watch method', () => {
     if (watcher) {
       await pEvent(watcher, 'copy')
     } else if (command) {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const chunk = await pEvent(command.stdout, 'data')
         if (chunk.indexOf('Copied:') >= 0) {
@@ -100,7 +98,6 @@ describe('The watch method', () => {
     if (watcher) {
       await pEvent(watcher, 'remove')
     } else if (command) {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const chunk = await pEvent(command.stdout, 'data')
         if (chunk.indexOf('Removed:') >= 0) {
@@ -113,15 +110,16 @@ describe('The watch method', () => {
 
   //= =========================================================================
 
-  describe('should copy specified files with globs at first:', () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe('should copy specified files with globs at first:', function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/untouchable.txt': 'untouchable',
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/this-is.txt': 'A pen',
         'test-ws/a/b/that-is.txt': 'A note',
         'test-ws/a/b/no-copy.dat': 'no-copy'
       })
+    }
     )
 
     /**
@@ -143,13 +141,13 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -158,8 +156,8 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should copy files in symlink directory at first when `--dereference` option was given:', () => {
-    beforeEach(async () => {
+  describe('should copy files in symlink directory at first when `--dereference` option was given:', function () {
+    beforeEach(async function () {
       await setupTestDir({
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
@@ -184,7 +182,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         dereference: true
       })
@@ -192,7 +190,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --dereference --verbose'
       )
@@ -201,8 +199,8 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should not copy files in symlink directory when `--dereference` option was not given:', () => {
-    beforeEach(async () => {
+  describe('should not copy files in symlink directory when `--dereference` option was not given:', function () {
+    beforeEach(async function () {
       await setupTestDir({
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
@@ -227,7 +225,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         dereference: false
       })
@@ -235,7 +233,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -244,15 +242,16 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should copy specified files with globs at first even if the glob starts with `./`:', () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe('should copy specified files with globs at first even if the glob starts with `./`:', function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/untouchable.txt': 'untouchable',
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/this-is.txt': 'A pen',
         'test-ws/a/b/that-is.txt': 'A note',
         'test-ws/a/b/no-copy.dat': 'no-copy'
       })
+    }
     )
 
     /**
@@ -274,13 +273,13 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('./test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"./test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -289,9 +288,9 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should clean and copy specified file blobs at first when give clean option:', () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe('should clean and copy specified file blobs at first when give clean option:', function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/untouchable.txt': 'untouchable',
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/this-is.txt': 'A pen',
@@ -300,6 +299,7 @@ describe('The watch method', () => {
         'test-ws/b/b/remove.txt': 'remove',
         'test-ws/b/b/no-remove.dat': 'no-remove'
       })
+    }
     )
 
     /**
@@ -323,7 +323,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         clean: true
       })
@@ -331,7 +331,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --clean --watch --verbose'
       )
@@ -340,15 +340,16 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should not copy specified files with globs at first when `--no-initial` option was given:', () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe('should not copy specified files with globs at first when `--no-initial` option was given:', function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/untouchable.txt': 'untouchable',
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/this-is.txt': 'A pen',
         'test-ws/a/b/that-is.txt': 'A note',
         'test-ws/a/b/no-copy.dat': 'no-copy'
       })
+    }
     )
 
     /**
@@ -370,7 +371,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         initialCopy: false
       })
@@ -378,7 +379,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --no-initial --watch --verbose'
       )
@@ -481,11 +482,10 @@ describe('The watch method', () => {
     }
   ]
   for (const pattern of patterns) {
-    // eslint-disable-next-line no-loop-func
     ;(pattern.only ? describe.only : describe)(pattern.description, () => {
-      beforeEach(() => setupTestDir(pattern.initialFiles))
+      beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
-      it('lib version.', async () => {
+      it('lib version.', async function () {
         watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
         await waitForReady()
         await pattern.action()
@@ -493,7 +493,7 @@ describe('The watch method', () => {
         await verifyTestDir(pattern.verify)
       })
 
-      it('command version.', async () => {
+      it('command version.', async function () {
         command = execCommand(
           '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
         )
@@ -526,11 +526,10 @@ describe('The watch method', () => {
     }
   ]
   for (const pattern of patternsWithIgnore) {
-    // eslint-disable-next-line no-loop-func
     ;(pattern.only ? describe.only : describe)(pattern.description, () => {
-      beforeEach(() => setupTestDir(pattern.initialFiles))
+      beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
-      it('lib version.', async () => {
+      it('lib version.', async function () {
         watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
           ignore: pattern.ignore
         })
@@ -540,7 +539,7 @@ describe('The watch method', () => {
         await verifyTestDir(pattern.verify)
       })
 
-      it('command version.', async () => {
+      it('command version.', async function () {
         command = execCommand(
                     `"test-ws/a/**/*.txt" test-ws/b --watch --verbose --ignore ${pattern.ignore.join(
                         ','
@@ -554,7 +553,7 @@ describe('The watch method', () => {
     })
   }
 
-  describe('should copy and watch file from a parent dir:', () => {
+  describe('should copy and watch file from a parent dir:', function () {
     const pattern = {
       initialFiles: {
         'test-ws/a/hello.txt': 'Hello',
@@ -570,9 +569,9 @@ describe('The watch method', () => {
       wait: waitForCopy
     }
 
-    beforeEach(() => setupTestDir(pattern.initialFiles))
+    beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
-    it('lib version', async () => {
+    it('lib version', async function () {
       const startingCwd = process.cwd()
       process.chdir(path.join(startingCwd, 'test-ws/a'))
       watcher = cpx.watch('../example.txt', '.')
@@ -584,12 +583,13 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should do reactions of multiple events:', () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe('should do reactions of multiple events:', function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/hello.dat': 'Hello'
       })
+    }
     )
 
     /**
@@ -605,7 +605,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await removeFile('test-ws/a/hello.dat')
@@ -616,7 +616,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -630,12 +630,13 @@ describe('The watch method', () => {
     })
   })
 
-  describe("should copy it when an empty directory is added when '--include-empty-dirs' option was given:", () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe("should copy it when an empty directory is added when '--include-empty-dirs' option was given:", function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/hello.txt': 'Hello'
       })
+    }
     )
 
     /**
@@ -650,7 +651,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         includeEmptyDirs: true
       })
@@ -660,7 +661,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
@@ -671,13 +672,14 @@ describe('The watch method', () => {
     })
   })
 
-  describe("should remove it on destination when an empty directory is removed when '--include-empty-dirs' option was given:", () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe("should remove it on destination when an empty directory is removed when '--include-empty-dirs' option was given:", function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/hello.txt': 'Hello',
         'test-ws/a/c': null
       })
+    }
     )
 
     /**
@@ -692,7 +694,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         includeEmptyDirs: true
       })
@@ -702,7 +704,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
@@ -713,12 +715,13 @@ describe('The watch method', () => {
     })
   })
 
-  describe("should copy it when a file is added even if '--no-initial' option was given:", () => {
-    beforeEach(() =>
-      setupTestDir({
+  describe("should copy it when a file is added even if '--no-initial' option was given:", function () {
+    beforeEach(function () {
+      return setupTestDir({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/b/hello.txt': 'Hello'
       })
+    }
     )
 
     /**
@@ -733,7 +736,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         initialCopy: false
       })
@@ -743,7 +746,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --no-initial --watch --verbose'
       )
@@ -754,12 +757,13 @@ describe('The watch method', () => {
     })
   })
 
-  describe('should copy it when a file is modified even if there are parentheses in path:', () => {
-    beforeEach(() =>
-      setupTestDir({
-        //
+  describe('should copy it when a file is modified even if there are parentheses in path:', function () {
+    beforeEach(function () {
+      return setupTestDir({
+      //
         'test-ws/a(paren)/hello.txt': 'Hello'
       })
+    }
     )
 
     /**
@@ -773,7 +777,7 @@ describe('The watch method', () => {
       })
     }
 
-    it('lib version.', async () => {
+    it('lib version.', async function () {
       watcher = cpx.watch('test-ws/a(paren)/**', 'test-ws/b', {
         initialCopy: false
       })
@@ -783,7 +787,7 @@ describe('The watch method', () => {
       await verifyFiles()
     })
 
-    it('command version.', async () => {
+    it('command version.', async function () {
       command = execCommand(
         '"test-ws/a(paren)/**" test-ws/b --no-initial --watch --verbose'
       )
