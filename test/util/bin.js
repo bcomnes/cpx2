@@ -10,7 +10,6 @@ if (process.argv.some(arg => arg === '-w' || arg === '--watch')) {
   process.stdin.setEncoding('utf8')
   process.stdin.on('data', chunk => {
     if (chunk === 'KILL') {
-      // eslint-disable-next-line no-process-exit
       process.exit(0)
     }
   })
