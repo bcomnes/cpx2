@@ -3,7 +3,7 @@
   "version": "7.0.1",
   "description": "Copy file globs, watching for changes.",
   "engines": {
-    "node": ">=18",
+    "node": "^20.0.0 || >=22.0.0",
     "npm": ">=10"
   },
   "main": "lib/index.js",
@@ -17,7 +17,10 @@
     "clean": "rm -rf .nyc_output coverage test-ws",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
     "lint": "eslint",
-    "test": "nyc --require @babel/register npm run -s _mocha",
+    "test": "run-s test:*",
+    "test:lint": "eslint",
+    "test:installed-check": "installed-check --ignore-dev",
+    "test:mocha": "nyc --require @babel/register npm run -s _mocha",
     "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
   },
   "dependencies": {
@@ -29,7 +32,7 @@
     "glob2base": "0.0.12",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",
-    "p-map": "^6.0.0",
+    "p-map": "^7.0.0",
     "resolve": "^1.12.0",
     "safe-buffer": "^5.2.0",
     "shell-quote": "^1.8.0",
@@ -43,8 +46,10 @@
     "eslint": "^9.11.1",
     "eslint-plugin-mocha": "^10.5.0",
     "gh-release": "^7.0.2",
+    "installed-check": "^9.3.0",
     "mocha": "^10.2.0",
     "neostandard": "^0.11.6",
+    "npm-run-all2": "^6.2.3",
     "nyc": "^17.0.0",
     "opener": "^1.5.1",
     "p-event": "^6.0.0",
