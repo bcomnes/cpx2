@@ -52,7 +52,7 @@ const writeFile = (module.exports.writeFile = async function writeFile (
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.removeFile = function removeFile (path) {
-  return fs.rmdir(path, { recursive: true, force: true})
+  return fs.rmdir(path, { recursive: true, force: true })
 }
 
 /**
@@ -88,7 +88,7 @@ module.exports.setupTestDir = function setupTestDir (dataset) {
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.teardownTestDir = function teardownTestDir (testRootPath) {
-  return fs.rmdir(testRootPath, { recursive: true, force: true})
+  return fs.rmdir(testRootPath, { recursive: true, force: true })
 }
 
 /**
