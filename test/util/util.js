@@ -52,7 +52,7 @@ const writeFile = (module.exports.writeFile = async function writeFile (
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.removeFile = function removeFile (path) {
-  return fs.rmdir(path, { recursive: true, force: true })
+  return fsPromises.rmdir(path, { recursive: true, force: true })
 }
 
 /**
@@ -62,7 +62,7 @@ module.exports.removeFile = function removeFile (path) {
  * @returns {Promise<string|null>} The content of the file, or `null` if not found.
  */
 const readFile = (module.exports.content = function content (path) {
-  return fs.readFile(path, { encoding: 'utf8' }).catch(() => null)
+  return fsPromises.readFile(path, { encoding: 'utf8' }).catch(() => null)
 })
 
 /**
@@ -88,7 +88,7 @@ module.exports.setupTestDir = function setupTestDir (dataset) {
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.teardownTestDir = function teardownTestDir (testRootPath) {
-  return fs.rmdir(testRootPath, { recursive: true, force: true })
+  return fsPromises.rmdir(testRootPath, { recursive: true, force: true })
 }
 
 /**
