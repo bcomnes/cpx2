@@ -1,8 +1,7 @@
 'use strict'
 
 const neostandard = require('neostandard')
-const mochaPluginModule = require('eslint-plugin-mocha')
-const mochaPlugin = mochaPluginModule.default ?? mochaPluginModule
+const mochaPlugin = require('eslint-plugin-mocha').default
 
 const ignores = [
   'coverage/**/*',
