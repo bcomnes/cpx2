@@ -703,7 +703,7 @@ describe('The watch method', function () {
         includeEmptyDirs: true
       })
       await waitForReady()
-      await fsPromises.rmdir('test-ws/a/c', { recursive: true, force: true })
+      await fsPromises.rm('test-ws/a/c', { recursive: true, force: true })
       await waitForRemove()
       await verifyFiles()
     })
@@ -713,7 +713,7 @@ describe('The watch method', function () {
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
       await waitForReady()
-      await fsPromises.rmdir('test-ws/a/c', { recursive: true, force: true })
+      await fsPromises.rm('test-ws/a/c', { recursive: true, force: true })
       await waitForRemove()
       await verifyFiles()
     })
