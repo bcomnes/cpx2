@@ -12,9 +12,8 @@
 
 const assert = require('assert')
 const path = require('path')
-const fs = require('fs-extra')
-const ensureDir = fs.ensureDir
-const remove = fs.remove
+const fs = require('fs')
+const fsPromises = require('fs/promises')
 const cpx = require('..')
 const util = require('./util/util')
 const delay = util.delay
@@ -162,7 +161,7 @@ describe('The watch method', function () {
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
       })
-      await fs.symlink(
+      await fsPromises.symlink(
         path.resolve('test-ws/src'),
         path.resolve('test-ws/a/link'),
         'junction'
@@ -205,7 +204,7 @@ describe('The watch method', function () {
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
       })
-      await fs.symlink(
+      await fsPromises.symlink(
         path.resolve('test-ws/src'),
         path.resolve('test-ws/a/link'),
         'junction'
@@ -646,7 +645,7 @@ describe('The watch method', function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       assert(fs.statSync('test-ws/b/c').isDirectory())
@@ -661,7 +660,7 @@ describe('The watch method', function () {
         includeEmptyDirs: true
       })
       await waitForReady()
-      await ensureDir('test-ws/a/c')
+      await fsPromises.mkdir('test-ws/a/c', { recursive: true })
       await waitForCopy()
       await verifyFiles()
     })
@@ -671,7 +670,7 @@ describe('The watch method', function () {
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
       await waitForReady()
-      await ensureDir('test-ws/a/c')
+      await fsPromises.mkdir('test-ws/a/c', { recursive: true })
       await waitForCopy()
       await verifyFiles()
     })
@@ -689,7 +688,7 @@ describe('The watch method', function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       assert.throws(() => fs.statSync('test-ws/b/c'), /ENOENT/u)
@@ -704,7 +703,7 @@ describe('The watch method', function () {
         includeEmptyDirs: true
       })
       await waitForReady()
-      await remove('test-ws/a/c')
+      await fsPromises.rm('test-ws/a/c', { recursive: true, force: true })
       await waitForRemove()
       await verifyFiles()
     })
@@ -714,7 +713,7 @@ describe('The watch method', function () {
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
       await waitForReady()
-      await remove('test-ws/a/c')
+      await fsPromises.rm('test-ws/a/c', { recursive: true, force: true })
       await waitForRemove()
       await verifyFiles()
     })

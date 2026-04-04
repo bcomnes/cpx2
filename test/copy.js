@@ -12,7 +12,8 @@
 
 const assert = require('assert')
 const path = require('path')
-const fs = require('fs-extra')
+const fs = require('fs')
+const fsPromises = require('fs/promises')
 const cpx = require('..')
 const util = require('./util/util')
 const setupTestDir = util.setupTestDir
@@ -208,7 +209,7 @@ describe('The copy method', function () {
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
       })
-      await fs.symlink(
+      await fsPromises.symlink(
         path.resolve('test-ws/src'),
         path.resolve('test-ws/a/link'),
         'junction'
@@ -258,7 +259,7 @@ describe('The copy method', function () {
         'test-ws/src/a/hello.txt': 'Symlinked',
         'test-ws/a/hello.txt': 'Hello'
       })
-      await fs.symlink(
+      await fsPromises.symlink(
         path.resolve('test-ws/src'),
         path.resolve('test-ws/a/link'),
         'junction'
@@ -460,8 +461,8 @@ describe('The copy method', function () {
          */
     function verifyFiles () {
       async function run () {
-        const srcStat = await fs.stat('./LICENSE')
-        const dstStat = await fs.stat('./test-ws/LICENSE')
+        const srcStat = await fsPromises.stat('./LICENSE')
+        const dstStat = await fsPromises.stat('./test-ws/LICENSE')
         const srcMtime = Math.floor(srcStat.mtime.getTime() / 1000)
         const dstMtime = Math.floor(dstStat.mtime.getTime() / 1000)
 
@@ -501,10 +502,10 @@ describe('The copy method', function () {
 
       const older = Date.now() / 1000
       const newer = older + 1
-      await fs.utimes('test-ws/a.txt', newer, newer)
-      await fs.utimes('test-ws/b.txt', older, older)
-      await fs.utimes('test-ws/a/a.txt', older, older)
-      await fs.utimes('test-ws/a/b.txt', newer, newer)
+      await fsPromises.utimes('test-ws/a.txt', newer, newer)
+      await fsPromises.utimes('test-ws/b.txt', older, older)
+      await fsPromises.utimes('test-ws/a/a.txt', older, older)
+      await fsPromises.utimes('test-ws/a/b.txt', newer, newer)
     })
 
     afterEach(function () { return teardownTestDir('test-ws') })
@@ -550,10 +551,10 @@ describe('The copy method', function () {
 
       const older = Date.now() / 1000
       const newer = older + 1
-      await fs.utimes('test-ws/a.txt', newer, newer)
-      await fs.utimes('test-ws/b.txt', older, older)
-      await fs.utimes('test-ws/a/a.txt', older, older)
-      await fs.utimes('test-ws/a/b.txt', newer, newer)
+      await fsPromises.utimes('test-ws/a.txt', newer, newer)
+      await fsPromises.utimes('test-ws/b.txt', older, older)
+      await fsPromises.utimes('test-ws/a/a.txt', older, older)
+      await fsPromises.utimes('test-ws/a/b.txt', newer, newer)
     })
 
     afterEach(function () { return teardownTestDir('test-ws') })
