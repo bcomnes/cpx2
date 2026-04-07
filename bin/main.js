@@ -50,7 +50,32 @@ module.exports = function main (source, outDir, args) {
         })
         const parts = parseShellQuote(command, env)
         const child = spawn(parts[0], parts.slice(1), { env })
-        const outer = Duplex.from(child.stdin, child.stdout)
+        const outer = new Duplex({
+          write(chunk, encoding, callback) {
+            if (!child.stdin.write(chunk, encoding)) {
+              child.stdin.once('drain', callback)
+            } else {
+              callback()
+            }
+          },
+          read(size) {
+            const chunk = child.stdout.read(size)
+            if (chunk !== null) {
+              this.push(chunk)
+            } else {
+              child.stdout.once('readable', () => {
+                const chunk = child.stdout.read(size)
+                if (chunk !== null) this.push(chunk)
+              })
+            }
+          },
+          destroy(err, callback) {
+            child.stdin.destroy(err)
+            child.stdout.destroy(err)
+            callback(err)
+          },
+        })
+        child.stdout.on('end', () => outer.push(null))
         child.on('exit', code => {
           if (code !== 0) {
             const error = new Error(
