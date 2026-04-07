@@ -13,7 +13,7 @@ const resolvePath = require('path').resolve
 const spawn = require('child_process').spawn
 const resolveModule = require('resolve').sync
 const parseShellQuote = require('shell-quote').parse
-const duplexer = require('duplexer')
+const Duplex = require('stream').Duplex
 const applyAction = require('../lib/utils/apply-action')
 const applyActionSync = require('../lib/utils/apply-action-sync')
 const copyFile = require('../lib/utils/copy-file')
@@ -50,7 +50,7 @@ module.exports = function main (source, outDir, args) {
         })
         const parts = parseShellQuote(command, env)
         const child = spawn(parts[0], parts.slice(1), { env })
-        const outer = duplexer(child.stdin, child.stdout)
+        const outer = Duplex.from({ readable: child.stdout, writable: child.stdin })
         child.on('exit', code => {
           if (code !== 0) {
             const error = new Error(
