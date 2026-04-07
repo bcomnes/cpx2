@@ -12,7 +12,8 @@
 const assert = require('assert')
 const exec = require('child_process').exec
 const dirname = require('path').dirname
-const fs = require('fs-extra')
+const fs = require('fs')
+const fsPromises = require('fs/promises')
 const execSync = require('shelljs').exec
 
 // ------------------------------------------------------------------------------
@@ -40,8 +41,8 @@ const writeFile = (module.exports.writeFile = async function writeFile (
   path,
   contentText
 ) {
-  await fs.ensureDir(dirname(path))
-  await fs.writeFile(path, contentText)
+  await fsPromises.mkdir(dirname(path), { recursive: true })
+  await fsPromises.writeFile(path, contentText)
 })
 
 /**
@@ -51,7 +52,7 @@ const writeFile = (module.exports.writeFile = async function writeFile (
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.removeFile = function removeFile (path) {
-  return fs.remove(path)
+  return fsPromises.rm(path, { recursive: true, force: true })
 }
 
 /**
@@ -61,7 +62,7 @@ module.exports.removeFile = function removeFile (path) {
  * @returns {Promise<string|null>} The content of the file, or `null` if not found.
  */
 const readFile = (module.exports.content = function content (path) {
-  return fs.readFile(path, { encoding: 'utf8' }).catch(() => null)
+  return fsPromises.readFile(path, { encoding: 'utf8' }).catch(() => null)
 })
 
 /**
@@ -74,7 +75,7 @@ module.exports.setupTestDir = function setupTestDir (dataset) {
   return Promise.all(
     Object.keys(dataset).map(path =>
       dataset[path] == null
-        ? fs.ensureDir(path)
+        ? fs.mkdirSync(path, { recursive: true })
         : writeFile(path, dataset[path])
     )
   ).then(() => delay(250))
@@ -87,7 +88,7 @@ module.exports.setupTestDir = function setupTestDir (dataset) {
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 module.exports.teardownTestDir = function teardownTestDir (testRootPath) {
-  return fs.remove(testRootPath)
+  return fsPromises.rm(testRootPath, { recursive: true, force: true })
 }
 
 /**
