@@ -51,7 +51,6 @@ module.exports = function main (source, outDir, args) {
         const parts = parseShellQuote(command, env)
         const child = spawn(parts[0], parts.slice(1), { env })
         const outer = Duplex.from({ readable: child.stdout, writable: child.stdin })
-        child.stdout.on('end', () => outer.push(null))
         child.on('exit', code => {
           if (code !== 0) {
             const error = new Error(
