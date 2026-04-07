@@ -1,6 +1,6 @@
 {
   "name": "cpx2",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Copy file globs, watching for changes.",
   "engines": {
     "node": "^20.0.0 || >=22.0.0",
@@ -11,8 +11,9 @@
     "cpx": "bin/index.js"
   },
   "scripts": {
-    "prepublishOnly": "git push --follow-tags && gh-release -y",
-    "version": "auto-changelog -p --template keepachangelog auto-changelog --breaking-pattern 'BREAKING CHANGE:' && git add CHANGELOG.md",
+    "preversion": "releasearoni preversion",
+    "version": "releasearoni version",
+    "prepublishOnly": "releasearoni",
     "_mocha": "_mocha \"test/*.js\" --timeout 35000",
     "clean": "rm -rf .nyc_output coverage test-ws",
     "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
@@ -25,7 +26,6 @@
   },
   "dependencies": {
     "debounce": "^3.0.0",
-    "duplexer": "^0.1.1",
     "glob": "^13.0.0",
     "glob2base": "0.0.12",
     "ignore": "^7.0.5",
@@ -38,11 +38,10 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
-    "auto-changelog": "^2.2.0",
     "babel-preset-power-assert": "^3.0.0",
     "eslint": "^9.11.1",
-    "eslint-plugin-mocha": "^10.5.0",
-    "gh-release": "^7.0.2",
+    "eslint-plugin-mocha": "^11.2.0",
+    "releasearoni": "^0.1.0",
     "installed-check": "^10.0.1",
     "mocha": "^11.0.1",
     "neostandard": "^0.13.0",
