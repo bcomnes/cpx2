@@ -125,6 +125,6 @@ export function execCommandSync (args) {
       code: error.status,
       stdout: error.stdout?.toString() ?? '',
       stderr: error.stderr?.toString() ?? '',
-    };
+    }
   }
 }
