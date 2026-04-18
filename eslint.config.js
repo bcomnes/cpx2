@@ -10,6 +10,12 @@ export default [
   { ignores },
   ...neostandard(),
   {
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
+    },
+  },
+  {
     ...mochaPlugin.configs.recommended,
     ignores: ['**/*', '!test/**/*'],
     rules: {
