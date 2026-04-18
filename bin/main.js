@@ -11,7 +11,7 @@
 import { resolve as resolvePath } from 'node:path'
 import { spawn } from 'node:child_process'
 import { sync as resolveModule } from 'resolve'
-import { parse as  parseShellQuote } from 'shell-quote'
+import { parse as parseShellQuote } from 'shell-quote'
 import { Duplex } from 'node:stream'
 import applyAction from '../lib/utils/apply-action'
 import applyActionSync from '../lib/utils/apply-action-sync'
