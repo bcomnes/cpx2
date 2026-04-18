@@ -13,7 +13,7 @@ import { exec } from 'node:child_process'
 import { dirname } from 'node:path'
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
-import { exec as execSync } from 'shelljs'
+import shelljs from 'shelljs'
 
 // ------------------------------------------------------------------------------
 // Public Interface
@@ -118,5 +118,5 @@ export function execCommand (args) {
  * @returns {void}
  */
 export function execCommandSync (args) {
-  return execSync(`node test/util/bin.js ${args}`, { silent: true })
+  return shelljs.exec(`node test/util/bin.js ${args}`, { silent: true })
 }
