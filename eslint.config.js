@@ -1,14 +1,12 @@
-'use strict'
-
-const neostandard = require('neostandard')
-const mochaPlugin = require('eslint-plugin-mocha').default
+import neostandard from 'neostandard'
+import mochaPlugin from 'eslint-plugin-mocha'
 
 const ignores = [
   'coverage/**/*',
   ...neostandard.resolveIgnoresFromGitignore()
 ]
 
-module.exports = [
+export default [
   { ignores },
   ...neostandard(),
   {
