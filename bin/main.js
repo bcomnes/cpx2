@@ -10,7 +10,7 @@
 
 import { resolve as resolvePath } from 'node:path'
 import { spawn } from 'node:child_process'
-import { sync as resolveModule } from 'resolve'
+import resolveModule from 'resolve'
 import { parse as parseShellQuote } from 'shell-quote'
 import { Duplex } from 'node:stream'
 import applyAction from '../lib/utils/apply-action.js'
@@ -82,7 +82,7 @@ export default function main (source, outDir, args) {
     .map(item => {
       const createStream = ABS_OR_REL.test(item.name)
         ? require(resolvePath(item.name))
-        : require(resolveModule(item.name, { basedir: process.cwd() }))
+        : require(resolveModule.sync(item.name, { basedir: process.cwd() }))
       return (file, opts) =>
         createStream(file, Object.assign({ _flags: opts }, item.argv))
     })
