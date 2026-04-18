@@ -1,4 +1,4 @@
-/* global mocha */
+/* eslint-env mocha */
 
 /**
  * @author Toru Nagashima
