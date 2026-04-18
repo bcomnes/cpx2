@@ -43,6 +43,6 @@ function append (_filename, args) {
 
 if (require.main === module) {
   process.stdin.pipe(append()).pipe(process.stdout)
-} else {
-  module.exports = append
 }
+
+export default append
