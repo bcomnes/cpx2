@@ -10,7 +10,7 @@
 
 import { resolve as resolvePath } from 'node:path'
 import { spawn } from 'node:child_process'
-import resolveModule from 'resolve'
+import { createRequire } from 'node:module'
 import { parse as parseShellQuote } from 'shell-quote'
 import { Duplex } from 'node:stream'
 import applyAction from '../lib/utils/apply-action.js'
@@ -23,6 +23,8 @@ import Watcher from '../lib/utils/watcher.js'
 // ------------------------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------------------------
+
+const require = createRequire(import.meta.url)
 
 const ABS_OR_REL = /^[./]/u
 const C_OR_COMMAND = /^(?:-c|--command)$/u
@@ -80,9 +82,12 @@ export default function main (source, outDir, args) {
       process.exit(1)
     })
     .map(item => {
-      const createStream = ABS_OR_REL.test(item.name)
-        ? require(resolvePath(item.name))
-        : require(resolveModule.sync(item.name, { basedir: process.cwd() }))
+      const modulePath = ABS_OR_REL.test(item.name)
+        ? resolvePath(item.name)
+        : require.resolve(item.name, { paths: [process.cwd()] })
+
+      const createStream = require(modulePath)
+      
       return (file, opts) =>
         createStream(file, Object.assign({ _flags: opts }, item.argv))
     })
