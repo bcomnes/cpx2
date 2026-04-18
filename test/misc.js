@@ -11,7 +11,7 @@
 // ------------------------------------------------------------------------------
 
 import assert from 'node:assert'
-const execCommandSync = require('./util/util').execCommandSync
+import { execCommandSync } from './util/util.js'
 
 // ------------------------------------------------------------------------------
 // Test
