@@ -16,7 +16,7 @@ import fsPromises from 'node:fs/promises'
 import * as cpx from '../lib/index.js'
 import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from './util/util.js'
 
-import pEventPromise from 'p-event'
+import { pEvent } from 'p-event'
 
 // ------------------------------------------------------------------------------
 // Test
@@ -33,7 +33,6 @@ describe('The watch method', function () {
     }
     if (command) {
       command.stdin.write('KILL')
-      const pEvent = (await pEventPromise).pEvent
       await pEvent(command, 'exit')
       await teardownTestDir('test-ws')
       command = null
@@ -47,7 +46,6 @@ describe('The watch method', function () {
      * @returns {Promise<void>} The promise which will go fulfilled after done.
      */
   async function waitForReady () {
-    const pEvent = (await pEventPromise).pEvent
     if (watcher) {
       await pEvent(watcher, 'watch-ready')
     } else if (command) {
@@ -66,7 +64,6 @@ describe('The watch method', function () {
      * @returns {Promise<void>} The promise which will go fulfilled after done.
      */
   async function waitForCopy () {
-    const pEvent = (await pEventPromise).pEvent
     if (watcher) {
       await pEvent(watcher, 'copy')
     } else if (command) {
@@ -85,7 +82,6 @@ describe('The watch method', function () {
      * @returns {Promise<void>} The promise which will go fulfilled after done.
      */
   async function waitForRemove () {
-    const pEvent = (await pEventPromise).pEvent
     if (watcher) {
       await pEvent(watcher, 'remove')
     } else if (command) {
