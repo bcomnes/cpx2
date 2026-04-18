@@ -117,5 +117,14 @@ export function execCommand (args) {
  * @returns {void}
  */
 export function execCommandSync (args) {
-  return execSync(`node test/util/bin.js ${args}`, { silent: true })
+  try {
+    const stdout = execSync(`node test/util/bin.js ${args}`, { encoding: 'utf8', stdio: 'pipe' })
+    return { code: 0, stdout, stderr: '' }
+  } catch (error) {
+    return {
+      code: error.status,
+      stdout: error.stdout?.toString() ?? '',
+      stderr: error.stderr?.toString() ?? '',
+    };
+  }
 }
