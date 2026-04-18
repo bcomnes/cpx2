@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * @author Toru Nagashima
  * @copyright 2016 Toru Nagashima. All rights reserved.
@@ -9,7 +8,10 @@
 // Exports
 // ------------------------------------------------------------------------------
 
-import pkg from '../package.json' with { type: 'json' }
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
+const pkg = require('../package.json')
 
 /**
  * Prints the version text.
