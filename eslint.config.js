@@ -10,18 +10,19 @@ export default [
   { ignores },
   ...neostandard(),
   {
-    languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: 'module',
-    },
-  },
-  {
     ...mochaPlugin.configs.recommended,
     ignores: ['**/*', '!test/**/*'],
     rules: {
       ...mochaPlugin.configs.recommended.rules,
       // Disable new v11 rule that conflicts with @stylistic/padded-blocks
       'mocha/consistent-spacing-between-blocks': 'off',
+    },
+  },
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2024,
+      sourceType: 'module',
     },
   },
 ]
