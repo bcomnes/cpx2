@@ -92,7 +92,7 @@ It maybe can use to add header comment, to optimize images, or etc...
 You can use this module as a node module.
 
 ```js
-var cpx = require("cpx2");
+import * as cpx from "cpx2";
 ```
 
 ### cpx.copy

@@ -3,23 +3,22 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const resolvePath = require('path').resolve
-const spawn = require('child_process').spawn
-const resolveModule = require('resolve').sync
-const parseShellQuote = require('shell-quote').parse
-const Duplex = require('stream').Duplex
-const applyAction = require('../lib/utils/apply-action')
-const applyActionSync = require('../lib/utils/apply-action-sync')
-const copyFile = require('../lib/utils/copy-file')
-const normalizeOptions = require('../lib/utils/normalize-options')
-const removeFileSync = require('../lib/utils/remove-file-sync')
-const Watcher = require('../lib/utils/watcher')
+import { resolve as resolvePath } from 'node:path'
+import { spawn } from 'node:child_process'
+import { sync as resolveModule } from 'resolve'
+import { parse as  parseShellQuote } from 'shell-quote'
+import { Duplex } from 'node:stream'
+import applyAction from '../lib/utils/apply-action'
+import applyActionSync from '../lib/utils/apply-action-sync'
+import copyFile from '../lib/utils/copy-file'
+import normalizeOptions from '../lib/utils/normalize-options'
+import removeFileSync from '../lib/utils/remove-file-sync'
+import Watcher from '../lib/utils/watcher'
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -33,7 +32,7 @@ const T_OR_TRANSFORM = /^(?:-t|--transform)$/u
 // Exports
 // ------------------------------------------------------------------------------
 
-module.exports = function main (source, outDir, args) {
+export default function main (source, outDir, args) {
   // Resolve Command.
   const commands = []
     .concat(args.command)

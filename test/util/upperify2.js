@@ -3,14 +3,13 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const Transform = require('stream').Transform
-const inherits = require('util').inherits
+import { Transform } from 'node:stream'
+import { inherits } from 'node:util'
 
 // ------------------------------------------------------------------------------
 // Helpers

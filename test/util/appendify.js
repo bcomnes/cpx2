@@ -3,13 +3,12 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const through = require('through')
+import through from 'through'
 
 // ------------------------------------------------------------------------------
 // Helpers
