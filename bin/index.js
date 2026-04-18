@@ -62,12 +62,12 @@ if (unknowns.size > 0) {
   console.error(`Unknown option(s): ${Array.from(unknowns).join(', ')}`)
   process.exitCode = 1
 } else if (args.help) { // Main.
-  (await import('./help')).default()
+  (await import('./help.js')).default()
 } else if (args.version) {
-  (await import('./version')).default()
+  (await import('./version.js')).default()
 } else if (source == null || outDir == null || args._.length > 2) {
-  (await import('./help')).default()
+  (await import('./help.js')).default()
   process.exitCode = 1
 } else {
-  (await import('./main')).default(source, outDir, args)
+  (await import('./main.js')).default(source, outDir, args)
 }

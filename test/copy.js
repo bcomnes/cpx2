@@ -13,10 +13,10 @@ import assert from 'node:assert'
 import path from 'node:path'
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
-import cpx from '..'
-import { setupTestDir, teardownTestDir, verifyTestDir, execCommandSync } from './util/util'
-import upperify from './util/upperify'
-import upperify2 from './util/upperify2'
+import cpx from '../index.js'
+import { setupTestDir, teardownTestDir, verifyTestDir, execCommandSync } from './util/util.js'
+import upperify from './util/upperify.js'
+import upperify2 from './util/upperify2.js'
 
 // ------------------------------------------------------------------------------
 // Test

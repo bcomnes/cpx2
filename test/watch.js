@@ -14,7 +14,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
 import cpx from '..'
-import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from './util/util'
+import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from './util/util.js'
 
 import pEventPromise from 'p-event'
 

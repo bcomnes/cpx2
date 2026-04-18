@@ -13,12 +13,12 @@ import { spawn } from 'node:child_process'
 import { sync as resolveModule } from 'resolve'
 import { parse as parseShellQuote } from 'shell-quote'
 import { Duplex } from 'node:stream'
-import applyAction from '../lib/utils/apply-action'
-import applyActionSync from '../lib/utils/apply-action-sync'
-import copyFile from '../lib/utils/copy-file'
-import normalizeOptions from '../lib/utils/normalize-options'
-import removeFileSync from '../lib/utils/remove-file-sync'
-import Watcher from '../lib/utils/watcher'
+import applyAction from '../lib/utils/apply-action.js'
+import applyActionSync from '../lib/utils/apply-action-sync.js'
+import copyFile from '../lib/utils/copy-file.js'
+import normalizeOptions from '../lib/utils/normalize-options.js'
+import removeFileSync from '../lib/utils/remove-file-sync.js'
+import Watcher from '../lib/utils/watcher.js'
 
 // ------------------------------------------------------------------------------
 // Helpers

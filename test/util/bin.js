@@ -15,4 +15,4 @@ if (process.argv.some(arg => arg === '-w' || arg === '--watch')) {
 }
 
 // Load the bin file.
-await import('../../bin/index')
+await import('../../bin/index.js')
