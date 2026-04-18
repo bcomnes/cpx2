@@ -87,7 +87,7 @@ export default function main (source, outDir, args) {
         : require.resolve(item.name, { paths: [process.cwd()] })
 
       const createStream = require(modulePath)
-      
+
       return (file, opts) =>
         createStream(file, Object.assign({ _flags: opts }, item.argv))
     })
