@@ -39,7 +39,7 @@
     "@babel/core": "^7.5.5",
     "@babel/register": "^7.5.5",
     "babel-preset-power-assert": "^3.0.0",
-    "eslint": "^9.11.1",
+    "eslint": "^10.2.0",
     "eslint-plugin-mocha": "^11.2.0",
     "releasearoni": "^0.1.0",
     "installed-check": "^10.0.1",
