@@ -13,7 +13,7 @@ import assert from 'node:assert'
 import path from 'node:path'
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
-import cpx from '..'
+import cpx from '../lib/index.js'
 import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from './util/util.js'
 
 import pEventPromise from 'p-event'
