@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 
 import through from 'through'
+import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -41,7 +42,7 @@ function append (_filename, args) {
 // Main
 // ------------------------------------------------------------------------------
 
-if (require.main === module) {
+if (isMain(import.meta.url)) {
   process.stdin.pipe(append()).pipe(process.stdout)
 }
 

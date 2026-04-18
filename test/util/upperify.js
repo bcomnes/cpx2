@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 
 import through from 'through'
+import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -33,7 +34,7 @@ function toUpperCase () {
 // Main
 // ------------------------------------------------------------------------------
 
-if (require.main === module) {
+if (isMain(import.meta.url)) {
   process.stdin.pipe(toUpperCase()).pipe(process.stdout)
 }
 
