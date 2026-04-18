@@ -8,7 +8,7 @@
 // Exports
 // ------------------------------------------------------------------------------
 
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 
 /**
  * Prints the version text.
