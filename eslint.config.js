@@ -18,11 +18,4 @@ export default [
       'mocha/consistent-spacing-between-blocks': 'off',
     },
   },
-  {
-    files: ['**/*.js'],
-    languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: 'module',
-    },
-  },
 ]
