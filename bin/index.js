@@ -4,13 +4,12 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const subarg = require('subarg')
+import subarg from 'subarg'
 
 // ------------------------------------------------------------------------------
 // Main
@@ -63,12 +62,12 @@ if (unknowns.size > 0) {
   console.error(`Unknown option(s): ${Array.from(unknowns).join(', ')}`)
   process.exitCode = 1
 } else if (args.help) { // Main.
-  require('./help')()
+  (await import('./help.js')).default()
 } else if (args.version) {
-  require('./version')()
+  (await import('./version.js')).default()
 } else if (source == null || outDir == null || args._.length > 2) {
-  require('./help')()
+  (await import('./help.js')).default()
   process.exitCode = 1
 } else {
-  require('./main')(source, outDir, args)
+  (await import('./main.js')).default(source, outDir, args)
 }

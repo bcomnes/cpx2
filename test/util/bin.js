@@ -3,7 +3,6 @@
  * @copyright 2017 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 if (process.argv.some(arg => arg === '-w' || arg === '--watch')) {
   // In order to kill me by test harness.
@@ -16,4 +15,4 @@ if (process.argv.some(arg => arg === '-w' || arg === '--watch')) {
 }
 
 // Load the bin file.
-require('../../bin/index')
+await import('../../bin/index.js')

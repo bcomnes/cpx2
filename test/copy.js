@@ -4,24 +4,19 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const assert = require('assert')
-const path = require('path')
-const fs = require('fs')
-const fsPromises = require('fs/promises')
-const cpx = require('..')
-const util = require('./util/util')
-const setupTestDir = util.setupTestDir
-const teardownTestDir = util.teardownTestDir
-const verifyTestDir = util.verifyTestDir
-const execCommandSync = util.execCommandSync
-const upperify = require('./util/upperify')
-const upperify2 = require('./util/upperify2')
+import assert from 'node:assert'
+import path from 'node:path'
+import fs from 'node:fs'
+import fsPromises from 'node:fs/promises'
+import * as cpx from '../lib/index.js'
+import { setupTestDir, teardownTestDir, verifyTestDir, execCommandSync } from './util/util.js'
+import upperify from './util/upperify.js'
+import upperify2 from './util/upperify2.js'
 
 // ------------------------------------------------------------------------------
 // Test

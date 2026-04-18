@@ -3,27 +3,28 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const resolvePath = require('path').resolve
-const spawn = require('child_process').spawn
-const resolveModule = require('resolve').sync
-const parseShellQuote = require('shell-quote').parse
-const Duplex = require('stream').Duplex
-const applyAction = require('../lib/utils/apply-action')
-const applyActionSync = require('../lib/utils/apply-action-sync')
-const copyFile = require('../lib/utils/copy-file')
-const normalizeOptions = require('../lib/utils/normalize-options')
-const removeFileSync = require('../lib/utils/remove-file-sync')
-const Watcher = require('../lib/utils/watcher')
+import { resolve as resolvePath } from 'node:path'
+import { spawn } from 'node:child_process'
+import { createRequire } from 'node:module'
+import { parse as parseShellQuote } from 'shell-quote'
+import { Duplex } from 'node:stream'
+import applyAction from '../lib/utils/apply-action.js'
+import applyActionSync from '../lib/utils/apply-action-sync.js'
+import copyFile from '../lib/utils/copy-file.js'
+import normalizeOptions from '../lib/utils/normalize-options.js'
+import removeFileSync from '../lib/utils/remove-file-sync.js'
+import Watcher from '../lib/utils/watcher.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------------------------
+
+const require = createRequire(import.meta.url)
 
 const ABS_OR_REL = /^[./]/u
 const C_OR_COMMAND = /^(?:-c|--command)$/u
@@ -33,7 +34,7 @@ const T_OR_TRANSFORM = /^(?:-t|--transform)$/u
 // Exports
 // ------------------------------------------------------------------------------
 
-module.exports = function main (source, outDir, args) {
+export default function main (source, outDir, args) {
   // Resolve Command.
   const commands = []
     .concat(args.command)
@@ -81,9 +82,13 @@ module.exports = function main (source, outDir, args) {
       process.exit(1)
     })
     .map(item => {
-      const createStream = ABS_OR_REL.test(item.name)
-        ? require(resolvePath(item.name))
-        : require(resolveModule(item.name, { basedir: process.cwd() }))
+      const modulePath = ABS_OR_REL.test(item.name)
+        ? resolvePath(item.name)
+        : require.resolve(item.name, { paths: [process.cwd()] })
+
+      const m = require(modulePath)
+      const createStream = m?.default ?? m
+
       return (file, opts) =>
         createStream(file, Object.assign({ _flags: opts }, item.argv))
     })

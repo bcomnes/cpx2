@@ -5,14 +5,13 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const assert = require('assert')
-const execCommandSync = require('./util/util').execCommandSync
+import assert from 'node:assert'
+import { execCommandSync } from './util/util.js'
 
 // ------------------------------------------------------------------------------
 // Test

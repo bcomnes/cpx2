@@ -3,13 +3,13 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const through = require('through')
+import through from 'through'
+import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -34,8 +34,8 @@ function toUpperCase () {
 // Main
 // ------------------------------------------------------------------------------
 
-if (require.main === module) {
+if (isMain(import.meta.url)) {
   process.stdin.pipe(toUpperCase()).pipe(process.stdout)
-} else {
-  module.exports = toUpperCase
 }
+
+export default toUpperCase

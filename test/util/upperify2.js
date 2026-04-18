@@ -3,14 +3,14 @@
  * @copyright 2016 Toru Nagashima. All rights reserved.
  * See LICENSE file in root directory for full license.
  */
-'use strict'
 
 // ------------------------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------------------------
 
-const Transform = require('stream').Transform
-const inherits = require('util').inherits
+import { Transform } from 'node:stream'
+import { inherits } from 'node:util'
+import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
@@ -49,8 +49,8 @@ function toUpperCase () {
 // Main
 // ------------------------------------------------------------------------------
 
-if (require.main === module) {
+if (isMain(import.meta.url)) {
   process.stdin.pipe(toUpperCase()).pipe(process.stdout)
-} else {
-  module.exports = toUpperCase
 }
+
+export default toUpperCase
