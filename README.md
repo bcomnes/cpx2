@@ -172,9 +172,7 @@ Please use GitHub Pull Requests.
 
 There are some npm-scripts to help developments.
 
-- `npm test` - Run tests and collect coverage.
-- `npm run build` - Make lib directory from src directory.
-- `npm run clean` - Delete directories (folders) which are created by other commands.
+- `npm test` - Run lint, dependency checks, and tests with coverage.
+- `npm run clean` - Delete directories and files which are created by other commands.
 - `npm run lint` - Run ESLint.
-- `npm run watch` - Run tests (not collect coverage) when each file was modified.
-- `npm run open-coverage` - Open the coverage report of the last `npm test` command with web browser.
+- `npm run watch` - Run tests when each file was modified.

@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 /**
  * @author Toru Nagashima
  * @copyright 2016 Toru Nagashima. All rights reserved.
@@ -10,15 +8,16 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-import assert from 'node:assert'
-import { execCommandSync } from './util/util.js'
+import assert from 'node:assert/strict'
+import { describe, test } from 'node:test'
+import { execCommandSync } from '#fixtures/util.js'
 
 // ------------------------------------------------------------------------------
 // Test
 // ------------------------------------------------------------------------------
 
-describe('[misc]', function () {
-  it('should throw error if invalid option was given.', function () {
+describe('[misc]', { concurrency: false }, function () {
+  test('should throw error if invalid option was given.', function () {
     const result = execCommandSync(
       '"test-ws/a/**/*.txt" test-ws/b --invalid'
     )
@@ -27,7 +26,7 @@ describe('[misc]', function () {
     assert(result.stderr === 'Unknown option(s): --invalid\n')
   })
 
-  it('should throw error if invalid options were given.', function () {
+  test('should throw error if invalid options were given.', function () {
     const result = execCommandSync(
       '"test-ws/a/**/*.txt" test-ws/b --invalid --foo --bar'
     )
@@ -36,42 +35,42 @@ describe('[misc]', function () {
     assert(result.stderr === 'Unknown option(s): --invalid, --foo, --bar\n')
   })
 
-  it('should throw error and show help if <source> and <dest> were lacking.', function () {
+  test('should throw error and show help if <source> and <dest> were lacking.', function () {
     const result = execCommandSync('')
 
     assert(result.code === 1)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should throw error and show help if <dest> was lacking.', function () {
+  test('should throw error and show help if <dest> was lacking.', function () {
     const result = execCommandSync('test-ws/**/*.js')
 
     assert(result.code === 1)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show help if --help option was given.', function () {
+  test('should show help if --help option was given.', function () {
     const result = execCommandSync('--help')
 
     assert(result.code === 0)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show help if -h option was given.', function () {
-    const result = execCommandSync('--help')
+  test('should show help if -h option was given.', function () {
+    const result = execCommandSync('-h')
 
     assert(result.code === 0)
     assert(/Usage:/u.test(result.stdout))
   })
 
-  it('should show version if --version option was given.', function () {
+  test('should show version if --version option was given.', function () {
     const result = execCommandSync('--version')
 
     assert(result.code === 0)
     assert(/^v[0-9]+\.[0-9]+\.[0-9]+\n$/u.test(result.stdout))
   })
 
-  it('should show version if -V option was given.', function () {
+  test('should show version if -V option was given.', function () {
     const result = execCommandSync('-V')
 
     assert(result.code === 0)
