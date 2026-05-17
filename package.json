@@ -38,7 +38,7 @@
     "subarg": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^9.11.1",
+    "eslint": "^10.4.0",
     "releasearoni": "^0.1.0",
     "installed-check": "^10.0.1",
     "neostandard": "^0.13.0",
