@@ -4,6 +4,7 @@
   "description": "Copy file globs, watching for changes.",
   "type": "module",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "imports": {
     "#lib": "./lib/index.js",
     "#fixtures/*.js": "./fixtures/*.js"
@@ -18,13 +19,15 @@
   "scripts": {
     "preversion": "releasearoni preversion",
     "version": "releasearoni version",
-    "prepublishOnly": "releasearoni",
+    "prepublishOnly": "npm run build:declaration && releasearoni",
     "clean": "rm -rf lcov.info test-ws",
     "lint": "eslint",
     "test": "run-s test:*",
-    "test:lint": "eslint",
     "test:installed-check": "installed-check --ignore-dev",
+    "test:lint": "eslint",
+    "test:tsc": "tsc",
     "test:node-test": "node --test --experimental-test-coverage --test-reporter spec --test-concurrency=1 --test-timeout=90000",
+    "build:declaration": "tsc -p declaration.tsconfig.json",
     "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=90000"
   },
   "dependencies": {
@@ -38,13 +41,15 @@
     "subarg": "^1.0.0"
   },
   "devDependencies": {
+    "@types/node": "^25.8.0",
+    "@voxpelli/tsconfig": "^16.2.1",
     "eslint": "^9.11.1",
-    "releasearoni": "^0.1.0",
     "installed-check": "^10.0.1",
     "neostandard": "^0.13.0",
     "npm-run-all2": "^8.0.4",
     "p-event": "^6.0.0",
-    "through": "^2.3.8"
+    "releasearoni": "^0.1.0",
+    "typescript": "^6.0.3"
   },
   "repository": {
     "type": "git",

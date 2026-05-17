@@ -8,7 +8,7 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-import through from 'through'
+import { Transform } from 'node:stream'
 import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
@@ -19,23 +19,23 @@ const postfix = process.argv[2] || ''
 
 /**
  * Creates a transform stream to append the specific text.
- * @param {string} _filename - The filename of the current file.
- * @param {any} args - arguments to transform.
- * @returns {stream.Transform} A transform stream to append the specific text.
+ * @param {string} [_filename] - The filename of the current file.
+ * @param {any} [args] - arguments to transform.
+ * @returns {Transform} A transform stream to append the specific text.
  */
 function append (_filename, args) {
-  return through(
-    /* @this stream.Transform */ function write (chunk) {
-      this.queue(chunk)
+  return new Transform({
+    transform (chunk, _encoding, callback) {
+      callback(null, chunk)
     },
-    /* @this stream.Transform */ function end () {
+    flush (callback) {
       const value = (args && args._ && args._[0]) || postfix
       if (value) {
-        this.queue(value)
+        this.push(value)
       }
-      this.queue(null)
+      callback()
     }
-  )
+  })
 }
 
 // ------------------------------------------------------------------------------

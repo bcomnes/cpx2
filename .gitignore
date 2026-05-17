@@ -4,3 +4,5 @@
 /npm-debug.log
 /test.js
 package-lock.json
+lib/**/*.d.ts
+lib/**/*.d.ts.map

@@ -5,19 +5,36 @@
  * See LICENSE file in root directory for full license.
  */
 
-// ------------------------------------------------------------------------------
-// Requirements
-// ------------------------------------------------------------------------------
+/**
+ * @import { SubargResult } from 'subarg'
+ */
 
 import subarg from 'subarg'
 
-// ------------------------------------------------------------------------------
-// Main
-// ------------------------------------------------------------------------------
+/**
+ * Parsed CLI arguments with all known flags declared explicitly.
+ * @typedef {object} CpxArgs
+ * @property {string[]} _
+ * @property {string | string[] | SubargResult | SubargResult[]} [command]
+ * @property {string | string[] | SubargResult | SubargResult[]} [transform]
+ * @property {boolean} [clean]
+ * @property {boolean} [dereference]
+ * @property {boolean} [force]
+ * @property {boolean} [help]
+ * @property {boolean} [include-empty-dirs]
+ * @property {boolean} [includeEmptyDirs]
+ * @property {string} [ignore]
+ * @property {boolean} [initial]
+ * @property {boolean} [preserve]
+ * @property {boolean} [update]
+ * @property {boolean} [verbose]
+ * @property {boolean} [version]
+ * @property {boolean} [watch]
+ */
 
 // Parse arguments.
 const unknowns = new Set()
-const args = subarg(process.argv.slice(2), {
+const args = /** @type {CpxArgs} */ (subarg(process.argv.slice(2), {
   alias: {
     c: 'command',
     C: 'clean',
@@ -48,12 +65,15 @@ const args = subarg(process.argv.slice(2), {
   ],
   string: ['ignore'],
   default: { initial: true },
+  /**
+   * @param {string} arg
+   */
   unknown (arg) {
     if (arg[0] === '-') {
       unknowns.add(arg)
     }
   }
-})
+}))
 const source = args._[0]
 const outDir = args._[1]
 
