@@ -108,7 +108,7 @@ export async function verifyTestDir (dataset) {
  * @returns {child_process.ChildProcess} A child process object.
  */
 export function execCommand (args) {
-  return exec(`node test/util/bin.js ${args}`)
+  return exec(`node fixtures/bin.js ${args}`)
 }
 
 /**
@@ -118,7 +118,7 @@ export function execCommand (args) {
  */
 export function execCommandSync (args) {
   try {
-    const stdout = execSync(`node test/util/bin.js ${args}`, { encoding: 'utf8', stdio: 'pipe' })
+    const stdout = execSync(`node fixtures/bin.js ${args}`, { encoding: 'utf8', stdio: 'pipe' })
     return { code: 0, stdout, stderr: '' }
   } catch (error) {
     return {

@@ -3,11 +3,15 @@
   "version": "8.0.2",
   "description": "Copy file globs, watching for changes.",
   "type": "module",
+  "main": "lib/index.js",
+  "imports": {
+    "#lib": "./lib/index.js",
+    "#fixtures/*.js": "./fixtures/*.js"
+  },
   "engines": {
-    "node": "^20.0.0 || >=22.0.0",
+    "node": "^22.0.0 || >=24.0.0",
     "npm": ">=10"
   },
-  "module": "lib/index.js",
   "bin": {
     "cpx": "bin/index.js"
   },
@@ -15,15 +19,13 @@
     "preversion": "releasearoni preversion",
     "version": "releasearoni version",
     "prepublishOnly": "releasearoni",
-    "_mocha": "_mocha \"test/*.js\" --timeout 35000",
-    "clean": "rm -rf .nyc_output coverage test-ws",
-    "coverage": "nyc report -r lcov && opener coverage/lcov-report/index.html",
+    "clean": "rm -rf lcov.info test-ws",
     "lint": "eslint",
     "test": "run-s test:*",
     "test:lint": "eslint",
     "test:installed-check": "installed-check --ignore-dev",
-    "test:mocha": "nyc --require @babel/register npm run -s _mocha",
-    "watch": "npm run -s _mocha -- --require @babel/register --watch --growl"
+    "test:node-test": "node --test --experimental-test-coverage --test-reporter spec --test-concurrency=1 --test-timeout=90000",
+    "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=90000"
   },
   "dependencies": {
     "debounce": "^3.0.0",
@@ -36,20 +38,12 @@
     "subarg": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/register": "^7.5.5",
-    "babel-preset-power-assert": "^3.0.0",
     "eslint": "^9.11.1",
-    "eslint-plugin-mocha": "^11.2.0",
     "releasearoni": "^0.1.0",
     "installed-check": "^10.0.1",
-    "mocha": "^11.0.1",
     "neostandard": "^0.13.0",
     "npm-run-all2": "^8.0.4",
-    "nyc": "^18.0.0",
-    "opener": "^1.5.1",
     "p-event": "^6.0.0",
-    "power-assert": "^1.6.1",
     "through": "^2.3.8"
   },
   "repository": {

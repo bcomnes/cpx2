@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 /**
  * @author Toru Nagashima
  * @copyright 2016 Toru Nagashima. All rights reserved.
@@ -9,12 +8,13 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-import assert from 'node:assert'
+import assert from 'node:assert/strict'
+import { afterEach, beforeEach, describe, test } from 'node:test'
 import path from 'node:path'
 import fs from 'node:fs'
 import fsPromises from 'node:fs/promises'
-import * as cpx from '../lib/index.js'
-import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from './util/util.js'
+import * as cpx from '#lib'
+import { delay, setupTestDir, teardownTestDir, verifyTestDir, writeFile, removeFile, execCommand } from '#fixtures/util.js'
 
 import { pEvent } from 'p-event'
 
@@ -22,21 +22,24 @@ import { pEvent } from 'p-event'
 // Test
 // ------------------------------------------------------------------------------
 
-describe('The watch method', function () {
+describe('The watch method', { concurrency: false }, function () {
   let watcher = null
   let command = null
 
   afterEach(async function () {
-    if (watcher) {
-      watcher.close()
-      watcher = null
-    }
-    if (command) {
-      command.stdin.write('KILL')
-      await pEvent(command, 'exit')
-      await teardownTestDir('test-ws')
-      command = null
-    } else {
+    try {
+      if (watcher) {
+        watcher.close()
+        watcher = null
+      }
+      if (command) {
+        if (command.stdin.writable) {
+          command.stdin.write('KILL')
+        }
+        await pEvent(command, 'exit')
+        command = null
+      }
+    } finally {
       await teardownTestDir('test-ws')
     }
   })
@@ -128,13 +131,13 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -169,7 +172,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         dereference: true
       })
@@ -177,7 +180,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --dereference --verbose'
       )
@@ -212,7 +215,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         dereference: false
       })
@@ -220,7 +223,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -260,13 +263,13 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('./test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"./test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -310,7 +313,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         clean: true
       })
@@ -318,7 +321,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --clean --watch --verbose'
       )
@@ -358,7 +361,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
         initialCopy: false
       })
@@ -366,7 +369,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --no-initial --watch --verbose'
       )
@@ -469,11 +472,10 @@ describe('The watch method', function () {
     }
   ]
   for (const pattern of patterns) {
-    // eslint-disable-next-line mocha/no-setup-in-describe
-    ;(pattern.only ? describe.only : describe)(pattern.description, () => {
+    describe(pattern.description, () => {
       beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
-      it('lib version.', async function () {
+      test('lib version.', async function () {
         watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
         await waitForReady()
         await pattern.action()
@@ -481,7 +483,7 @@ describe('The watch method', function () {
         await verifyTestDir(pattern.verify)
       })
 
-      it('command version.', async function () {
+      test('command version.', async function () {
         command = execCommand(
           '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
         )
@@ -514,13 +516,9 @@ describe('The watch method', function () {
     }
   ]
   for (const pattern of patternsWithIgnore) {
-    // eslint-disable-next-line mocha/no-setup-in-describe
-    ;(pattern.only ? describe.only : describe)(pattern.description, () => {
-      // eslint-disable-next-line mocha/no-sibling-hooks
+    describe(pattern.description, () => {
       beforeEach(function () { return setupTestDir(pattern.initialFiles) })
-
-      // eslint-disable-next-line mocha/no-identical-title
-      it('lib version.', async function () {
+      test('lib version.', async function () {
         watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b', {
           ignore: pattern.ignore
         })
@@ -530,8 +528,7 @@ describe('The watch method', function () {
         await verifyTestDir(pattern.verify)
       })
 
-      // eslint-disable-next-line mocha/no-identical-title
-      it('command version.', async function () {
+      test('command version.', async function () {
         command = execCommand(
                     `"test-ws/a/**/*.txt" test-ws/b --watch --verbose --ignore ${pattern.ignore.join(
                         ','
@@ -563,7 +560,7 @@ describe('The watch method', function () {
 
     beforeEach(function () { return setupTestDir(pattern.initialFiles) })
 
-    it('lib version', async function () {
+    test('lib version', async function () {
       const startingCwd = process.cwd()
       process.chdir(path.join(startingCwd, 'test-ws/a'))
       watcher = cpx.watch('../example.txt', '.')
@@ -597,7 +594,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**/*.txt', 'test-ws/b')
       await waitForReady()
       await removeFile('test-ws/a/hello.dat')
@@ -608,7 +605,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**/*.txt" test-ws/b --watch --verbose'
       )
@@ -643,7 +640,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         includeEmptyDirs: true
       })
@@ -653,7 +650,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
@@ -686,7 +683,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         includeEmptyDirs: true
       })
@@ -696,7 +693,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --include-empty-dirs --watch --verbose'
       )
@@ -728,7 +725,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a/**', 'test-ws/b', {
         initialCopy: false
       })
@@ -738,7 +735,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a/**" test-ws/b --no-initial --watch --verbose'
       )
@@ -769,7 +766,7 @@ describe('The watch method', function () {
       })
     }
 
-    it('lib version.', async function () {
+    test('lib version.', async function () {
       watcher = cpx.watch('test-ws/a(paren)/**', 'test-ws/b', {
         initialCopy: false
       })
@@ -779,7 +776,7 @@ describe('The watch method', function () {
       await verifyFiles()
     })
 
-    it('command version.', async function () {
+    test('command version.', async function () {
       command = execCommand(
         '"test-ws/a(paren)/**" test-ws/b --no-initial --watch --verbose'
       )
