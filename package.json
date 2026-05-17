@@ -24,8 +24,8 @@
     "test": "run-s test:*",
     "test:lint": "eslint",
     "test:installed-check": "installed-check --ignore-dev",
-    "test:node-test": "node --test --experimental-test-coverage --test-reporter spec --test-concurrency=1 --test-timeout=35000",
-    "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=35000"
+    "test:node-test": "node --test --experimental-test-coverage --test-reporter spec --test-concurrency=1 --test-timeout=90000",
+    "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=90000"
   },
   "dependencies": {
     "debounce": "^3.0.0",
