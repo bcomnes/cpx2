@@ -52,7 +52,7 @@
     "neostandard": "^0.13.0",
     "npm-run-all2": "^8.0.4",
     "p-event": "^6.0.0",
-    "releasearoni": "^0.1.0",
+    "releasearoni": "^0.2.0",
     "typescript": "^6.0.3"
   },
   "repository": {
