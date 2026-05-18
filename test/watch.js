@@ -8,6 +8,12 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
+/**
+ * @import Watcher from '../lib/utils/watcher.js'
+ * @import { ChildProcess } from 'node:child_process'
+ * @import { Readable } from 'node:stream'
+ */
+
 import assert from 'node:assert/strict'
 import { afterEach, beforeEach, describe, test } from 'node:test'
 import path from 'node:path'
@@ -23,7 +29,9 @@ import { pEvent } from 'p-event'
 // ------------------------------------------------------------------------------
 
 describe('The watch method', { concurrency: false }, function () {
+  /** @type {Watcher | null} */
   let watcher = null
+  /** @type {ChildProcess | null} */
   let command = null
 
   afterEach(async function () {
@@ -33,7 +41,7 @@ describe('The watch method', { concurrency: false }, function () {
         watcher = null
       }
       if (command) {
-        if (command.stdin.writable) {
+        if (command.stdin && command.stdin.writable) {
           command.stdin.write('KILL')
         }
         await pEvent(command, 'exit')
@@ -53,8 +61,8 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'watch-ready')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(command.stdout, 'data')
-        if (chunk.indexOf('Be watching') >= 0) {
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
+        if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Be watching') >= 0) {
           break
         }
       }
@@ -71,8 +79,8 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'copy')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(command.stdout, 'data')
-        if (chunk.indexOf('Copied:') >= 0) {
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
+        if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Copied:') >= 0) {
           break
         }
       }
@@ -89,8 +97,8 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'remove')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(command.stdout, 'data')
-        if (chunk.indexOf('Removed:') >= 0) {
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
+        if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Removed:') >= 0) {
           break
         }
       }
@@ -114,7 +122,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -161,7 +169,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -204,7 +212,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -246,7 +254,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -294,7 +302,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -344,7 +352,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -378,6 +386,11 @@ describe('The watch method', { concurrency: false }, function () {
     })
   })
 
+  /**
+   * @typedef {{ description: string, initialFiles: Record<string, string | null>, action: () => Promise<void>, verify: Record<string, string | null>, wait: () => Promise<void> }} WatchPattern
+   */
+
+  /** @type {WatchPattern[]} */
   const patterns = [
     {
       description: 'should copy on file added:',
@@ -495,6 +508,11 @@ describe('The watch method', { concurrency: false }, function () {
     })
   }
 
+  /**
+   * @typedef {{ description: string, initialFiles: Record<string, string | null>, action: () => Promise<void>, verify: Record<string, string | null>, wait: () => Promise<void>, ignore: string[] }} WatchPatternWithIgnore
+   */
+
+  /** @type {WatchPatternWithIgnore[]} */
   const patternsWithIgnore = [
     {
       description: 'should ignore ignored files:',
@@ -544,17 +562,17 @@ describe('The watch method', { concurrency: false }, function () {
 
   describe('should copy and watch file from a parent dir:', function () {
     const pattern = {
-      initialFiles: {
+      initialFiles: /** @type {Record<string, string | null>} */ ({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/example.txt': 'intial copy'
-      },
+      }),
       action () {
         return writeFile('../example.txt', 'updated file')
       },
-      verify: {
+      verify: /** @type {Record<string, string | null>} */ ({
         'test-ws/a/hello.txt': 'Hello',
         'test-ws/a/example.txt': 'updated file'
-      },
+      }),
       wait: waitForCopy
     }
 
@@ -583,7 +601,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -715,7 +733,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -757,7 +775,7 @@ describe('The watch method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({

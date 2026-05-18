@@ -18,9 +18,15 @@ import { setupTestDir, teardownTestDir, verifyTestDir, execCommandSync } from '#
 import upperify from '#fixtures/upperify.js'
 import upperify2 from '#fixtures/upperify2.js'
 
-function copyWithCallback (...args) {
+/**
+ * @param {string} source
+ * @param {string} outDir
+ * @param {import('#lib').CopyOptions} [options]
+ * @returns {Promise<void>}
+ */
+function copyWithCallback (source, outDir, options) {
   return new Promise((resolve, reject) => {
-    cpx.copy(...args, error => {
+    cpx.copy(source, outDir, options ?? {}, error => {
       if (error) {
         reject(error)
         return
@@ -51,7 +57,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -104,7 +110,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -172,7 +178,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -224,7 +230,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -273,7 +279,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -314,7 +320,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       async function run () {
@@ -366,7 +372,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       async function run () {
@@ -415,7 +421,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -456,7 +462,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       async function run () {
@@ -510,7 +516,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -558,7 +564,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({
@@ -592,7 +598,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/b/hello.txt': 'HELLO' })
@@ -613,7 +619,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/b/hello.txt': 'HELLO' })
@@ -634,7 +640,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/b/hello.txt': 'HELLO' })
@@ -644,14 +650,14 @@ describe('The copy method', { concurrency: false }, function () {
       await copyWithCallback(
         'test-ws/a/**/*.txt',
         'test-ws/b',
-        { transform: upperify })
+        { transform: /** @type {any} */ (upperify) })
       await verifyFiles()
     })
 
     test('should throw an error on lib sync version (cannot use streaming api).', function () {
       assert.throws(() => {
         cpx.copySync('test-ws/a/**/*.txt', 'test-ws/b', {
-          transform: upperify
+          transform: /** @type {any} */ (upperify)
         })
       }, Error)
     })
@@ -671,7 +677,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/b/hello.txt': 'HELLO' })
@@ -681,14 +687,14 @@ describe('The copy method', { concurrency: false }, function () {
       await copyWithCallback(
         'test-ws/a/**/*.txt',
         'test-ws/b',
-        { transform: upperify2 })
+        { transform: /** @type {any} */ (upperify2) })
       await verifyFiles()
     })
 
     test('should throw an error on lib sync version (cannot use streaming api).', function () {
       assert.throws(() => {
         cpx.copySync('test-ws/a/**/*.txt', 'test-ws/b', {
-          transform: upperify2
+          transform: /** @type {any} */ (upperify2)
         })
       }, Error)
     })
@@ -708,7 +714,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/b/hello.txt': 'Helloabcd' })
@@ -732,7 +738,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({ 'test-ws/hello.txt': 'Hello' })
@@ -762,7 +768,7 @@ describe('The copy method', { concurrency: false }, function () {
 
     /**
          * Verify.
-         * @returns {void}
+         * @returns {Promise<void>}
          */
     function verifyFiles () {
       return verifyTestDir({

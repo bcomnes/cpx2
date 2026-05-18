@@ -4,9 +4,11 @@
  * See LICENSE file in root directory for full license.
  */
 
-// ------------------------------------------------------------------------------
-// Requirements
-// ------------------------------------------------------------------------------
+/**
+ * @import { CpxArgs } from './index.js'
+ * @import { TransformFactory } from '../lib/utils/normalize-options.js'
+ * @import { SubargResult } from 'subarg'
+ */
 
 import { resolve as resolvePath } from 'node:path'
 import { spawn } from 'node:child_process'
@@ -20,135 +22,143 @@ import normalizeOptions from '../lib/utils/normalize-options.js'
 import removeFileSync from '../lib/utils/remove-file-sync.js'
 import Watcher from '../lib/utils/watcher.js'
 
-// ------------------------------------------------------------------------------
-// Helpers
-// ------------------------------------------------------------------------------
-
 const require = createRequire(import.meta.url)
 
 const ABS_OR_REL = /^[./]/u
 const C_OR_COMMAND = /^(?:-c|--command)$/u
 const T_OR_TRANSFORM = /^(?:-t|--transform)$/u
 
-// ------------------------------------------------------------------------------
-// Exports
-// ------------------------------------------------------------------------------
-
+/**
+ * @param {string} source
+ * @param {string} outDir
+ * @param {CpxArgs} args
+ * @returns {void}
+ */
 export default function main (source, outDir, args) {
   // Resolve Command.
+  /** @type {TransformFactory[]} */
   const commands = []
-    .concat(args.command)
+    .concat(/** @type {any} */ (args.command))
     .filter(Boolean)
-    .map(command => {
+    .map(/** @param {string | SubargResult} command */ command => {
       if (typeof command !== 'string') {
         console.error('Invalid --command option')
         process.exit(1)
       }
 
+      /** @type {TransformFactory} */
       return file => {
         const env = Object.create(process.env, {
           FILE: { value: file }
         })
         const parts = parseShellQuote(command, env)
-        const child = spawn(parts[0], parts.slice(1), { env })
-        const outer = Duplex.from({ readable: child.stdout, writable: child.stdin })
+        const child = spawn(
+          /** @type {string} */ (parts[0]),
+          /** @type {string[]} */ (parts.slice(1)),
+          { env }
+        )
+        const outer = Duplex.from(/** @type {any} */ ({ readable: child.stdout, writable: child.stdin }))
         child.on('exit', code => {
           if (code !== 0) {
-            const error = new Error(
-                            `non-zero exit code in command: ${command}`
-            )
+            const error = new Error(`non-zero exit code in command: ${command}`)
             outer.emit('error', error)
           }
         })
-        child.stderr.pipe(process.stderr)
+        child.stderr?.pipe(process.stderr)
 
         return outer
       }
     })
 
   // Resolve Transforms.
+  /** @type {Array<{ name: string, argv: SubargResult | null }>} */
   const transforms = []
-    .concat(args.transform)
+    .concat(/** @type {any} */ (args.transform))
     .filter(Boolean)
-    .map(arg => { // eslint-disable-line array-callback-return
+    .map(/** @param {string | SubargResult} arg @returns {{ name: string, argv: SubargResult | null } | undefined} */ arg => { // eslint-disable-line array-callback-return
       if (typeof arg === 'string') {
         return { name: arg, argv: null }
       }
-      if (typeof arg._[0] === 'string') {
-        return { name: arg._.shift(), argv: arg }
+      const sub = /** @type {SubargResult} */ (arg)
+      if (typeof sub._[0] === 'string') {
+        return { name: /** @type {string} */ (sub._.shift()), argv: sub }
       }
 
       console.error('Invalid --transform option')
       process.exit(1)
     })
-    .map(item => {
-      const modulePath = ABS_OR_REL.test(item.name)
-        ? resolvePath(item.name)
-        : require.resolve(item.name, { paths: [process.cwd()] })
+    .filter(x => x != null)
 
-      const m = require(modulePath)
-      const createStream = m?.default ?? m
+  /** @type {TransformFactory[]} */
+  const transformFactories = transforms.map(item => {
+    const modulePath = ABS_OR_REL.test(item.name)
+      ? resolvePath(item.name)
+      : require.resolve(item.name, { paths: [process.cwd()] })
 
-      return (file, opts) =>
-        createStream(file, Object.assign({ _flags: opts }, item.argv))
-    })
+    const m = require(modulePath)
+    const createStream = m?.default ?? m
 
-  // Merge commands and transforms as same as order of process.argv.
+    /** @type {TransformFactory} */
+    return (file, opts) =>
+      createStream(file, Object.assign({ _flags: opts }, item.argv))
+  })
+
+  // Merge commands and transforms in the same order as process.argv.
+  /** @type {TransformFactory[]} */
   const mergedTransformFactories = process.argv
     .map(part => {
       if (C_OR_COMMAND.test(part)) {
-        return commands.shift()
+        return commands.shift() ?? null
       }
       if (T_OR_TRANSFORM.test(part)) {
-        return transforms.shift()
+        return transformFactories.shift() ?? null
       }
       return null
     })
-    .filter(Boolean)
+    .filter(x => x != null)
 
   // Main.
   const log = args.verbose
     ? console.log.bind(console)
-    : () => {
-        /* do nothing */
-      }
-  const options = normalizeOptions(source, outDir, {
+    : () => { /* do nothing */ }
+
+  const opts = normalizeOptions(source, outDir, /** @type {any} */ ({
     transform: mergedTransformFactories,
     dereference: args.dereference,
-    includeEmptyDirs: args.includeEmptyDirs,
+    includeEmptyDirs: args['include-empty-dirs'],
     initialCopy: args.initial,
     force: args.force,
     preserve: args.preserve,
     update: args.update,
-    ignore: args.ignore && args.ignore.split(',')
-  })
+    ignore: args.ignore ? args.ignore.split(',') : undefined
+  }))
 
   if (args.clean) {
-    const output = options.toDestination(options.source)
-    if (output !== options.source) {
+    const output = opts.toDestination(opts.source)
+    if (output !== opts.source) {
       log()
       log(`Clean: ${output}`)
       log()
       try {
-        applyActionSync(output, options, targetPath => {
+        applyActionSync(output, opts, targetPath => {
           removeFileSync(targetPath)
           log(`Removed: ${targetPath}`)
         })
       } catch (err) {
-        console.error(`Failed to clean: ${err.message}.`)
+        console.error(`Failed to clean: ${/** @type {Error} */ (err).message}.`)
         process.exit(1)
       }
     }
   }
 
   if (args.watch) {
-    if (options.initialCopy) {
+    if (opts.initialCopy) {
       log()
       log(`Copy: ${source} --> ${outDir}`)
       log()
     }
 
-    new Watcher(options)
+    new Watcher(opts)
       .on('copy', event => {
         log(`Copied: ${event.srcPath} --> ${event.dstPath}`)
       })
@@ -157,11 +167,11 @@ export default function main (source, outDir, args) {
       })
       .on('watch-ready', () => {
         log()
-        log(`Be watching ${options.source}`)
+        log(`Be watching ${opts.source}`)
         log()
       })
       .on('watch-error', err => {
-        console.error(err.message)
+        console.error(/** @type {Error} */ (err).message)
       })
       .open()
   } else {
@@ -169,17 +179,17 @@ export default function main (source, outDir, args) {
     log(`Copy: ${source} --> ${outDir}`)
     log()
 
-    applyAction(options.source, options, sourcePath => {
-      const outputPath = options.toDestination(sourcePath)
+    applyAction(opts.source, opts, sourcePath => {
+      const outputPath = opts.toDestination(sourcePath)
       if (outputPath !== sourcePath) {
-        return copyFile(sourcePath, outputPath, options).then(() => {
+        return copyFile(sourcePath, outputPath, opts).then(() => {
           log(`Copied: ${sourcePath} --> ${outputPath}`)
         })
       }
       return Promise.resolve()
     }).catch(error => {
       console.error(error)
-      console.error(`Failed to copy: ${error.message}.`)
+      console.error(`Failed to copy: ${/** @type {Error} */ (error).message}.`)
       process.exit(1)
     })
   }

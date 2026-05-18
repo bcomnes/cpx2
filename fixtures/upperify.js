@@ -8,7 +8,7 @@
 // Requirements
 // ------------------------------------------------------------------------------
 
-import through from 'through'
+import { Transform } from 'node:stream'
 import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
@@ -17,17 +17,14 @@ import isMain from './is-main.js'
 
 /**
  * Creates a transform stream to convert data to upper cases.
- * @returns {stream.Transform} A transform stream to convert data to upper cases.
+ * @returns {Transform} A transform stream to convert data to upper cases.
  */
 function toUpperCase () {
-  return through(
-    /* @this stream.Transform */ function write (chunk) {
-      this.queue(chunk.toString().toUpperCase())
-    },
-    /* @this stream.Transform */ function end () {
-      this.queue(null)
+  return new Transform({
+    transform (chunk, _encoding, callback) {
+      callback(null, chunk.toString().toUpperCase())
     }
-  )
+  })
 }
 
 // ------------------------------------------------------------------------------

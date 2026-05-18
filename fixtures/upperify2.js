@@ -9,37 +9,27 @@
 // ------------------------------------------------------------------------------
 
 import { Transform } from 'node:stream'
-import { inherits } from 'node:util'
 import isMain from './is-main.js'
 
 // ------------------------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------------------------
 
-/**
- * The implementation of the transform stream to convert data to upper case.
- * @constructor
- */
-function Upperify () {
-  Transform.call(this)
-}
-
-inherits(Upperify, Transform)
-
-Object.defineProperties(Upperify.prototype, {
-  _transform: {
-    value: function _transform (data, _encoding, callback) {
-      callback(null, data.toString().toUpperCase())
-    },
-    configurable: true,
-    enumerable: false,
-    writable: true
+class Upperify extends Transform {
+  /**
+   * @override
+   * @param {Buffer | string} data
+   * @param {BufferEncoding} _encoding
+   * @param {(err?: Error | null, data?: unknown) => void} callback
+   */
+  _transform (data, _encoding, callback) {
+    callback(null, data.toString().toUpperCase())
   }
-})
+}
 
 /**
  * Creates a transform stream to convert data to upper cases.
- * @returns {stream.Transform} A transform stream to convert data to upper cases.
+ * @returns {Transform} A transform stream to convert data to upper cases.
  */
 function toUpperCase () {
   return new Upperify()

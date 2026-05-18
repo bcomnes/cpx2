@@ -4,14 +4,9 @@
  * See LICENSE file in root directory for full license.
  */
 
-// ------------------------------------------------------------------------------
-// Exports
-// ------------------------------------------------------------------------------
-
 import { createRequire } from 'node:module'
 
-const require = createRequire(import.meta.url)
-const pkg = require('../package.json')
+const pkg = /** @type {{ version: string }} */ (createRequire(import.meta.url)('../package.json'))
 
 /**
  * Prints the version text.

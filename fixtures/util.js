@@ -66,7 +66,7 @@ export function readFile (path) {
 /**
  * Sets up test files.
  *
- * @param {object} dataset - Test data to write.
+ * @param {Record<string, string | null>} dataset - Test data to write.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 export function setupTestDir (dataset) {
@@ -74,7 +74,7 @@ export function setupTestDir (dataset) {
     Object.keys(dataset).map(path =>
       dataset[path] == null
         ? fs.mkdirSync(path, { recursive: true })
-        : writeFile(path, dataset[path])
+        : writeFile(path, /** @type {string} */ (dataset[path]))
     )
   ).then(() => delay(250))
 }
@@ -90,9 +90,9 @@ export function teardownTestDir (testRootPath) {
 }
 
 /**
- * Sets up test files.
+ * Verifies test files match expected content.
  *
- * @param {object} dataset - Test data to write.
+ * @param {Record<string, string | null>} dataset - Test data to verify.
  * @returns {Promise<void>} The promise which will go fulfilled after done.
  */
 export async function verifyTestDir (dataset) {
@@ -105,26 +105,31 @@ export async function verifyTestDir (dataset) {
 /**
  * Execute cpx command.
  * @param {string} args - Command arguments.
- * @returns {child_process.ChildProcess} A child process object.
+ * @returns {import('node:child_process').ChildProcess} A child process object.
  */
 export function execCommand (args) {
   return exec(`node fixtures/bin.js ${args}`)
 }
 
 /**
- * Execute cpx command.
+ * @typedef {{ code: number, stdout: string, stderr: string }} CommandResult
+ */
+
+/**
+ * Execute cpx command synchronously.
  * @param {string} args - Command arguments.
- * @returns {void}
+ * @returns {CommandResult}
  */
 export function execCommandSync (args) {
   try {
     const stdout = execSync(`node fixtures/bin.js ${args}`, { encoding: 'utf8', stdio: 'pipe' })
     return { code: 0, stdout, stderr: '' }
-  } catch (error) {
+  } catch (err) {
+    const error = /** @type {NodeJS.ErrnoException & { status?: number, stdout?: unknown, stderr?: unknown }} */ (err)
     return {
-      code: error.status,
-      stdout: error.stdout?.toString() ?? '',
-      stderr: error.stderr?.toString() ?? '',
+      code: error.status ?? 1,
+      stdout: error.stdout != null ? String(error.stdout) : '',
+      stderr: error.stderr != null ? String(error.stderr) : '',
     }
   }
 }
