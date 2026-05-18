@@ -11,6 +11,7 @@
 /**
  * @import Watcher from '../lib/utils/watcher.js'
  * @import { ChildProcess } from 'node:child_process'
+ * @import { Readable } from 'node:stream'
  */
 
 import assert from 'node:assert/strict'
@@ -60,7 +61,7 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'watch-ready')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(/** @type {import('node:stream').Readable} */ (command.stdout), 'data')
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
         if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Be watching') >= 0) {
           break
         }
@@ -78,7 +79,7 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'copy')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(/** @type {import('node:stream').Readable} */ (command.stdout), 'data')
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
         if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Copied:') >= 0) {
           break
         }
@@ -96,7 +97,7 @@ describe('The watch method', { concurrency: false }, function () {
       await pEvent(watcher, 'remove')
     } else if (command) {
       while (true) {
-        const chunk = await pEvent(/** @type {import('node:stream').Readable} */ (command.stdout), 'data')
+        const chunk = await pEvent(/** @type {Readable} */ (command.stdout), 'data')
         if (/** @type {Buffer} */ (/** @type {unknown} */ (chunk)).indexOf('Removed:') >= 0) {
           break
         }
