@@ -19,7 +19,7 @@
   "scripts": {
     "preversion": "releasearoni preversion",
     "version": "releasearoni version",
-    "prepublishOnly": "npm run build:declaration && releasearoni",
+    "prepublishOnly": "releasearoni",
     "clean": "rm -rf lcov.info test-ws",
     "lint": "eslint",
     "test": "run-s test:*",
@@ -27,7 +27,7 @@
     "test:lint": "eslint",
     "test:tsc": "tsc",
     "test:node-test": "node --test --experimental-test-coverage --test-reporter spec --test-concurrency=1 --test-timeout=90000",
-    "build:declaration": "tsc -p declaration.tsconfig.json",
+    "build": "tsc -p declaration.tsconfig.json",
     "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=90000"
   },
   "dependencies": {
