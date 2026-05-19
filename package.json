@@ -1,6 +1,6 @@
 {
   "name": "cpx2",
-  "version": "8.0.2",
+  "version": "9.0.0",
   "description": "Copy file globs, watching for changes.",
   "type": "module",
   "main": "lib/index.js",
