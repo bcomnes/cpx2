@@ -21,7 +21,6 @@
     "cpx": "bin/index.js"
   },
   "scripts": {
-    "preversion": "releasearoni preversion",
     "version": "releasearoni version",
     "prepublishOnly": "releasearoni",
     "clean": "rm -rf lcov.info test-ws",
