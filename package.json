@@ -44,7 +44,7 @@
     "subarg": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^25.8.0",
+    "@types/node": "^26.0.0",
     "@voxpelli/tsconfig": "^16.2.1",
     "eslint": "^9.11.1",
     "installed-check": "^10.0.1",
