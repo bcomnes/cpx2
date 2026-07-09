@@ -52,7 +52,7 @@
     "npm-run-all2": "^9.0.1",
     "p-event": "^6.0.0",
     "releasearoni": "^0.2.0",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "repository": {
     "type": "git",
