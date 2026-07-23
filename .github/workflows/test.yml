@@ -5,9 +5,13 @@ on: [pull_request, push]
 env:
   FORCE_COLOR: 1
 
+permissions: {}
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
 
     strategy:
       fail-fast: false
@@ -17,21 +21,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
     - name: Use Node.js ${{ matrix.node }}
       uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node }}
-    - run: npm i --ignore-scripts
+        package-manager-cache: false
+    - run: npm install --ignore-scripts
     - run: npm test --color=always
 
   automerge:
     needs: [test]
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' && startsWith(github.head_ref, 'dependabot/github_actions/actions/') }}
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       contents: write
     steps:
-      - uses: fastify/github-action-merge-dependabot@v3
-        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' && contains(github.head_ref, 'dependabot/github_actions') }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge first-party GitHub Actions Dependabot PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge "$PR_URL" --squash --delete-branch

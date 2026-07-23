@@ -1,0 +1,13 @@
+rules:
+  dependabot-cooldown:
+    config:
+      days: 1
+  unpinned-uses:
+    config:
+      policies:
+        # Official GitHub actions, CodeQL, and npm-bump use major tags for compatible security updates.
+        "actions/*": ref-pin
+        "github/codeql-action/*": ref-pin
+        "bcomnes/npm-bump": ref-pin
+        # Require immutable references for every other third-party action.
+        "*": hash-pin

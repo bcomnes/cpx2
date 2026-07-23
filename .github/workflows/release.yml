@@ -34,13 +34,16 @@ jobs:
     steps:
     - uses: actions/checkout@v7
       with:
+        # Keep the credential because npm-bump pushes the release commit and tag.
+        persist-credentials: true
         # fetch full history so things like auto-changelog work properly
         fetch-depth: 0
     - name: Use Node.js
       uses: actions/setup-node@v7
       with:
         node-version-file: package.json
-    - run: npm i --ignore-scripts
+        package-manager-cache: false
+    - run: npm install --ignore-scripts
     - run: npm test
     - name: Version and publish to npm
       uses: bcomnes/npm-bump@v3
