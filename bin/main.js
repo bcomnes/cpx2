@@ -51,11 +51,14 @@ export default function main (source, outDir, args) {
         const env = Object.create(process.env, {
           FILE: { value: file }
         })
-        const parts = parseShellQuote(command, env)
+        const parts = parseShellQuote(command, env).filter(part => typeof part === 'string')
+        if (parts.length === 0 || !parts[0]) {
+          throw new Error(`Invalid --command option: ${command}`)
+        }
         const child = spawn(
           /** @type {string} */ (parts[0]),
           /** @type {string[]} */ (parts.slice(1)),
-          { env }
+          { env, shell: false }
         )
         const outer = Duplex.from(/** @type {any} */ ({ readable: child.stdout, writable: child.stdin }))
         child.on('exit', code => {
