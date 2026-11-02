@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "@voxpelli/tsconfig": "^16.2.1",
+    "@voxpelli/tsconfig": "^17.0.0",
     "eslint": "^9.11.1",
     "installed-check": "^11.0.0",
     "neostandard": "^0.14.1",
