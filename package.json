@@ -38,7 +38,7 @@
     "glob": "^13.0.0",
     "glob2base": "0.0.12",
     "ignore": "^7.0.5",
-    "minimatch": "^10.0.1",
+    "minimatch": "^11.0.3",
     "p-map": "^7.0.0",
     "shell-quote": "^1.8.0",
     "subarg": "^1.0.0"
