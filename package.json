@@ -10,7 +10,7 @@
     "#fixtures/*.js": "./fixtures/*.js"
   },
   "engines": {
-    "node": "^22.0.0 || >=24.0.0",
+    "node": "^22.2.0 || >=24.0.0",
     "npm": ">=10"
   },
   "files": [
@@ -34,7 +34,7 @@
     "watch": "node --watch --test --test-reporter spec --test-concurrency=1 --test-timeout=90000"
   },
   "dependencies": {
-    "debounce": "^3.0.0",
+    "debounce": "^4.0.0",
     "glob": "^14.0.3",
     "glob2base": "0.0.12",
     "ignore": "^7.0.5",
