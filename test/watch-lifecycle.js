@@ -12,6 +12,8 @@ import { setImmediate } from 'node:timers/promises'
 import { describe, test } from 'node:test'
 import Watcher from '../lib/utils/watcher.js'
 import normalizeOptions from '../lib/utils/normalize-options.js'
+import normalizePath from '../lib/utils/normalize-path.js'
+import { watch } from '#lib'
 
 /**
  * Track actual native handles and traversal completion, without timing sleeps.
@@ -258,6 +260,105 @@ describe('watch session lifecycle', { concurrency: false }, () => {
     await Promise.all(h.closures)
     assert.equal(h.ready.mock.callCount(), 0)
     assert.equal(h.active.size, 0)
+  })
+
+  for (const operation of ['initial copy', 'queued copy', 'removal']) {
+    test(`close with drain waits for a real ${operation}`, { timeout: 10000 }, async t => {
+      const h = await setup(t)
+      const source = path.join(h.src, 'file.txt')
+      const output = path.join(h.watcher.outputDir, 'file.txt')
+      const queued = path.join(h.src, 'queued.txt')
+      const queuedOutput = path.join(h.watcher.outputDir, 'queued.txt')
+      await fsPromises.writeFile(source, 'contents')
+      if (operation !== 'initial copy') {
+        // Seed both files before opening so native events cannot reorder the test queue.
+        await fsPromises.writeFile(queued, 'must not remove')
+        const ready = once(h.watcher, 'watch-ready')
+        h.watcher.open()
+        await ready
+      }
+
+      const entered = Promise.withResolvers()
+      const release = Promise.withResolvers()
+      if (operation === 'removal') {
+        const unlink = fsPromises.unlink
+        t.mock.method(fsPromises, 'unlink', async (/** @type {string} */ filename) => {
+          if (path.resolve(filename) === output) {
+            entered.resolve(undefined)
+            await release.promise
+          }
+          return unlink(filename)
+        })
+      } else {
+        const mkdir = fsPromises.mkdir
+        t.mock.method(fsPromises, 'mkdir', async (/** @type {string} */ dir, /** @type {{ recursive: true }} */ options) => {
+          if (path.resolve(dir) === path.dirname(output)) {
+            entered.resolve(undefined)
+            await release.promise
+          }
+          return mkdir(dir, options)
+        })
+      }
+
+      /** @type {Promise<void>[]} */
+      const drains = []
+      try {
+        if (operation === 'initial copy') h.watcher.open()
+        else {
+          h.watcher.queue.set(normalizePath(source), operation === 'removal' ? 'remove' : 'change')
+          h.watcher.queue.set(normalizePath(queued), 'remove')
+          h.internals.onTrigger()
+        }
+        await entered.promise
+        assert.equal(h.watcher.close(), undefined)
+        let drained = false
+        drains.push(h.watcher.close({ drain: true }).then(() => { drained = true }), h.watcher.close({ drain: true }))
+        await setImmediate()
+        assert.equal(drained, false)
+      } finally {
+        release.resolve(undefined)
+        await Promise.all(drains)
+      }
+      if (operation === 'removal') await assert.rejects(fsPromises.access(output), { code: 'ENOENT' })
+      else assert.equal(await fsPromises.readFile(output, 'utf8'), 'contents')
+      if (operation !== 'initial copy') assert.equal(await fsPromises.readFile(queuedOutput, 'utf8'), 'must not remove')
+    })
+  }
+
+  test('close with drain stops scheduling immediately and waits for startup cleanup', async t => {
+    const h = await setup(t)
+    const output = path.join(h.watcher.outputDir, 'stale.txt')
+    await fsPromises.mkdir(h.watcher.outputDir)
+    await fsPromises.writeFile(output, 'stale')
+    await fsPromises.writeFile(path.join(h.src, 'fresh.txt'), 'must not copy')
+    const entered = Promise.withResolvers()
+    const release = Promise.withResolvers()
+    const unlink = fsPromises.unlink
+    t.mock.method(fsPromises, 'unlink', async (/** @type {string} */ filename) => {
+      if (path.resolve(filename) === output) {
+        entered.resolve(undefined)
+        await release.promise
+      }
+      return unlink(filename)
+    })
+    const watcher = watch(`${h.src.replaceAll('\\', '/')}/**/*.txt`, h.watcher.outputDir, { clean: true })
+    const ready = t.mock.fn()
+    watcher.on('watch-ready', ready)
+    try {
+      await entered.promise
+      let drained = false
+      watcher.close({ drain: true }).then(() => { drained = true })
+      assert.equal(watcher.trigger, null)
+      await setImmediate()
+      assert.equal(drained, false)
+    } finally {
+      release.resolve(undefined)
+      await watcher.close({ drain: true })
+    }
+    await setImmediate()
+    assert.equal(ready.mock.callCount(), 0)
+    assert.equal(h.acquisition.mock.callCount(), 0)
+    await assert.rejects(fsPromises.access(output), { code: 'ENOENT' })
   })
 
   test('old initial copies cannot complete readiness for a reopened session', async t => {
