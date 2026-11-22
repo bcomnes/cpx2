@@ -12,6 +12,7 @@ import { setImmediate } from 'node:timers/promises'
 import { describe, test } from 'node:test'
 import Watcher from '../lib/utils/watcher.js'
 import normalizeOptions from '../lib/utils/normalize-options.js'
+import { watch } from '#lib'
 
 /**
  * Track actual native handles and traversal completion, without timing sleeps.
@@ -320,6 +321,41 @@ describe('watch session lifecycle', { concurrency: false }, () => {
       await assert.rejects(fsPromises.access(path.join(h.watcher.outputDir, 'queued.txt')), { code: 'ENOENT' })
     })
   }
+
+  test('closeAndDrain waits for startup cleanup and prevents traversal afterward', async t => {
+    const h = await setup(t)
+    const output = path.join(h.watcher.outputDir, 'stale.txt')
+    await fsPromises.mkdir(h.watcher.outputDir)
+    await fsPromises.writeFile(output, 'stale')
+    await fsPromises.writeFile(path.join(h.src, 'fresh.txt'), 'must not copy')
+    const entered = Promise.withResolvers()
+    const release = Promise.withResolvers()
+    const unlink = fsPromises.unlink
+    t.mock.method(fsPromises, 'unlink', async (/** @type {string} */ filename) => {
+      if (path.resolve(filename) === output) {
+        entered.resolve(undefined)
+        await release.promise
+      }
+      return unlink(filename)
+    })
+    const watcher = watch(`${h.src.replaceAll('\\', '/')}/**/*.txt`, h.watcher.outputDir, { clean: true })
+    const ready = t.mock.fn()
+    watcher.on('watch-ready', ready)
+    try {
+      await entered.promise
+      let drained = false
+      watcher.closeAndDrain().then(() => { drained = true })
+      await setImmediate()
+      assert.equal(drained, false)
+    } finally {
+      release.resolve(undefined)
+      await watcher.closeAndDrain()
+    }
+    await setImmediate()
+    assert.equal(ready.mock.callCount(), 0)
+    assert.equal(h.acquisition.mock.callCount(), 0)
+    await assert.rejects(fsPromises.access(output), { code: 'ENOENT' })
+  })
 
   test('old initial copies cannot complete readiness for a reopened session', async t => {
     const h = await setup(t)
