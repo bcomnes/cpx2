@@ -49,6 +49,7 @@ import { copy, copySync, watch } from 'cpx2'
 import type { CopyOptions, CopySyncOptions, NormalizedOptions, TransformFactory } from 'cpx2'
 
 export { copy, copySync, watch }
+export const stop = (watcher: ReturnType<typeof watch>): Promise<void> => watcher.closeAndDrain()
 export type { CopyOptions, CopySyncOptions, NormalizedOptions, TransformFactory }
 `)
   await writeFile(join(consumer, 'tsconfig.json'), JSON.stringify({

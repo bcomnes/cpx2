@@ -260,6 +260,67 @@ describe('watch session lifecycle', { concurrency: false }, () => {
     assert.equal(h.active.size, 0)
   })
 
+  for (const operation of ['initial copy', 'queued copy', 'removal']) {
+    test(`closeAndDrain waits for a real ${operation}`, async t => {
+      const h = await setup(t)
+      const source = path.join(h.src, 'file.txt')
+      const output = path.join(h.watcher.outputDir, 'file.txt')
+      await fsPromises.writeFile(source, 'contents')
+      if (operation !== 'initial copy') {
+        const ready = once(h.watcher, 'watch-ready')
+        h.watcher.open()
+        await ready
+      }
+
+      const entered = Promise.withResolvers()
+      const release = Promise.withResolvers()
+      if (operation === 'removal') {
+        const unlink = fsPromises.unlink
+        t.mock.method(fsPromises, 'unlink', async (/** @type {string} */ filename) => {
+          if (path.resolve(filename) === output) {
+            entered.resolve(undefined)
+            await release.promise
+          }
+          return unlink(filename)
+        })
+      } else {
+        const mkdir = fsPromises.mkdir
+        t.mock.method(fsPromises, 'mkdir', async (/** @type {string} */ dir, /** @type {{ recursive: true }} */ options) => {
+          if (path.resolve(dir) === path.dirname(output)) {
+            entered.resolve(undefined)
+            await release.promise
+          }
+          return mkdir(dir, options)
+        })
+      }
+
+      /** @type {Promise<void>[]} */
+      const drains = []
+      try {
+        if (operation === 'initial copy') h.watcher.open()
+        else {
+          const queued = path.join(h.src, 'queued.txt')
+          await fsPromises.writeFile(queued, 'must not copy')
+          h.watcher.queue.set(source, operation === 'removal' ? 'remove' : 'change')
+          h.watcher.queue.set(queued, 'add')
+          h.internals.onTrigger()
+        }
+        await entered.promise
+        h.watcher.close()
+        let drained = false
+        drains.push(h.watcher.closeAndDrain().then(() => { drained = true }), h.watcher.closeAndDrain())
+        await setImmediate()
+        assert.equal(drained, false)
+      } finally {
+        release.resolve(undefined)
+        await Promise.all(drains)
+      }
+      if (operation === 'removal') await assert.rejects(fsPromises.access(output), { code: 'ENOENT' })
+      else assert.equal(await fsPromises.readFile(output, 'utf8'), 'contents')
+      await assert.rejects(fsPromises.access(path.join(h.watcher.outputDir, 'queued.txt')), { code: 'ENOENT' })
+    })
+  }
+
   test('old initial copies cannot complete readiness for a reopened session', async t => {
     const h = await setup(t)
     await fsPromises.writeFile(path.join(h.src, 'file.txt'), 'hello')
