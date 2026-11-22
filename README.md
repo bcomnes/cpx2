@@ -144,9 +144,9 @@ After the first copy, starts observing.  And copy the files when every changes.
 
 Arguments is same as `cpx.copy`.
 
-`cpx.watch` returns an `EventEmitter` with two ways to stop watching.
-Call `watcher.close()` to stop scheduling work synchronously, or `await watcher.closeAndDrain()` to also wait for any copies or removals already underway, including initial copies and cleanup.
-Use `closeAndDrain()` before handing the destination to another writer.
+`cpx.watch` returns an `EventEmitter` with a `close()` method.
+Call `watcher.close()` to stop scheduling work synchronously without waiting for in-flight writes.
+Before handing the destination to another writer, use `await watcher.close({ drain: true })` to also wait for copies and removals already underway, including initial copies and cleanup.
 
 - `.on("copy", (e) => { ... })` : Be fired after file is copied. `e.srcPath` is a path of original file. `e.dstPath` is a path of new file.
 - `.on("remove", (e) => { ... })` : Be fired after file is removed. `e.path` is a path of removed file.

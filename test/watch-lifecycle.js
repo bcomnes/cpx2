@@ -263,7 +263,7 @@ describe('watch session lifecycle', { concurrency: false }, () => {
   })
 
   for (const operation of ['initial copy', 'queued copy', 'removal']) {
-    test(`closeAndDrain waits for a real ${operation}`, { timeout: 10000 }, async t => {
+    test(`close with drain waits for a real ${operation}`, { timeout: 10000 }, async t => {
       const h = await setup(t)
       const source = path.join(h.src, 'file.txt')
       const output = path.join(h.watcher.outputDir, 'file.txt')
@@ -310,9 +310,9 @@ describe('watch session lifecycle', { concurrency: false }, () => {
           h.internals.onTrigger()
         }
         await entered.promise
-        h.watcher.close()
+        assert.equal(h.watcher.close(), undefined)
         let drained = false
-        drains.push(h.watcher.closeAndDrain().then(() => { drained = true }), h.watcher.closeAndDrain())
+        drains.push(h.watcher.close({ drain: true }).then(() => { drained = true }), h.watcher.close({ drain: true }))
         await setImmediate()
         assert.equal(drained, false)
       } finally {
@@ -325,7 +325,7 @@ describe('watch session lifecycle', { concurrency: false }, () => {
     })
   }
 
-  test('closeAndDrain waits for startup cleanup and prevents traversal afterward', async t => {
+  test('close with drain stops scheduling immediately and waits for startup cleanup', async t => {
     const h = await setup(t)
     const output = path.join(h.watcher.outputDir, 'stale.txt')
     await fsPromises.mkdir(h.watcher.outputDir)
@@ -347,12 +347,13 @@ describe('watch session lifecycle', { concurrency: false }, () => {
     try {
       await entered.promise
       let drained = false
-      watcher.closeAndDrain().then(() => { drained = true })
+      watcher.close({ drain: true }).then(() => { drained = true })
+      assert.equal(watcher.trigger, null)
       await setImmediate()
       assert.equal(drained, false)
     } finally {
       release.resolve(undefined)
-      await watcher.closeAndDrain()
+      await watcher.close({ drain: true })
     }
     await setImmediate()
     assert.equal(ready.mock.callCount(), 0)
