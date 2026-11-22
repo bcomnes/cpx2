@@ -12,6 +12,7 @@ import { setImmediate } from 'node:timers/promises'
 import { describe, test } from 'node:test'
 import Watcher from '../lib/utils/watcher.js'
 import normalizeOptions from '../lib/utils/normalize-options.js'
+import normalizePath from '../lib/utils/normalize-path.js'
 import { watch } from '#lib'
 
 /**
@@ -262,12 +263,16 @@ describe('watch session lifecycle', { concurrency: false }, () => {
   })
 
   for (const operation of ['initial copy', 'queued copy', 'removal']) {
-    test(`closeAndDrain waits for a real ${operation}`, async t => {
+    test(`closeAndDrain waits for a real ${operation}`, { timeout: 10000 }, async t => {
       const h = await setup(t)
       const source = path.join(h.src, 'file.txt')
       const output = path.join(h.watcher.outputDir, 'file.txt')
+      const queued = path.join(h.src, 'queued.txt')
+      const queuedOutput = path.join(h.watcher.outputDir, 'queued.txt')
       await fsPromises.writeFile(source, 'contents')
       if (operation !== 'initial copy') {
+        // Seed both files before opening so native events cannot reorder the test queue.
+        await fsPromises.writeFile(queued, 'must not remove')
         const ready = once(h.watcher, 'watch-ready')
         h.watcher.open()
         await ready
@@ -300,10 +305,8 @@ describe('watch session lifecycle', { concurrency: false }, () => {
       try {
         if (operation === 'initial copy') h.watcher.open()
         else {
-          const queued = path.join(h.src, 'queued.txt')
-          await fsPromises.writeFile(queued, 'must not copy')
-          h.watcher.queue.set(source, operation === 'removal' ? 'remove' : 'change')
-          h.watcher.queue.set(queued, 'add')
+          h.watcher.queue.set(normalizePath(source), operation === 'removal' ? 'remove' : 'change')
+          h.watcher.queue.set(normalizePath(queued), 'remove')
           h.internals.onTrigger()
         }
         await entered.promise
@@ -318,7 +321,7 @@ describe('watch session lifecycle', { concurrency: false }, () => {
       }
       if (operation === 'removal') await assert.rejects(fsPromises.access(output), { code: 'ENOENT' })
       else assert.equal(await fsPromises.readFile(output, 'utf8'), 'contents')
-      await assert.rejects(fsPromises.access(path.join(h.watcher.outputDir, 'queued.txt')), { code: 'ENOENT' })
+      if (operation !== 'initial copy') assert.equal(await fsPromises.readFile(queuedOutput, 'utf8'), 'must not remove')
     })
   }
 
